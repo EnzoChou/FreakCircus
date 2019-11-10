@@ -50,14 +50,19 @@ local cannone
 local pallaDiCannone
 local bersaglio
 local scimmia
-local angoloCannone = math.pi/6 --30 gradi
+local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local impulso= 800;
+local impulso= 600;
 
 
 local function sparaPallaDiCannone()
     pallaDiCannone.gravityScale=1
+    angoloCannone = math.pi/6 - cannone.rotation*math.pi/180
     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloCannone), -impulso*math.sin(angoloCannone), pallaDiCannone.x, pallaDiCannone.y )
+end
+
+function ruotaCannone()
+    transition.to(cannone,{rotation=-60,time=5000})
 end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -92,13 +97,16 @@ function scene:create( event )
 
     pallaDiCannone = display.newImageRect( mainGroup, oggettiDiScena2, 1, 100, 100 )
     pallaDiCannone.x=display.contentCenterX-550
-    pallaDiCannone.y=display.contentHeight-375
+    pallaDiCannone.y=display.contentHeight-330
     physics.addBody(pallaDiCannone,"dynamic",{ radius=30, bounce=0.3,density=10})
     pallaDiCannone.gravityScale=0
 
     cannone = display.newImageRect( mainGroup, oggettiDiScena, 1, 400,300 )
     cannone.x=display.contentCenterX-750
-    cannone.y=display.contentHeight-270
+    cannone.y=display.contentHeight-130
+    cannone.anchorX =  130/321 --175,642/321
+    cannone.anchorY = 176,203/234
+    ruotaCannone()
     cannone:addEventListener("tap",sparaPallaDiCannone)
 
     scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 400, 300 )

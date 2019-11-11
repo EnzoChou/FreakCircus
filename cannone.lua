@@ -56,13 +56,16 @@ local impulso= 600;
 
 
 local function sparaPallaDiCannone()
-    pallaDiCannone.gravityScale=1
+    cannone:removeEventListener("tap",sparaPallaDiCannone)
+    display.remove( pivotJoint )
+    cannone.isBodyActive = false
     angoloCannone = math.pi/6 - cannone.rotation*math.pi/180
     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloCannone), -impulso*math.sin(angoloCannone), pallaDiCannone.x, pallaDiCannone.y )
 end
 
 function ruotaCannone()
     transition.to(cannone,{rotation=-60,time=5000})
+    transition.to(pallaDiCannone,{rotation=-60,time=5000})
 end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -97,17 +100,18 @@ function scene:create( event )
 
     pallaDiCannone = display.newImageRect( mainGroup, oggettiDiScena2, 1, 100, 100 )
     pallaDiCannone.x=display.contentCenterX-550
-    pallaDiCannone.y=display.contentHeight-330
+    pallaDiCannone.y=display.contentHeight-360
     physics.addBody(pallaDiCannone,"dynamic",{ radius=30, bounce=0.3,density=10})
-    pallaDiCannone.gravityScale=0
 
     cannone = display.newImageRect( mainGroup, oggettiDiScena, 1, 400,300 )
     cannone.x=display.contentCenterX-750
     cannone.y=display.contentHeight-130
     cannone.anchorX =  130/321 --175,642/321
     cannone.anchorY = 176,203/234
-    ruotaCannone()
+    physics.addBody(cannone,"static")
     cannone:addEventListener("tap",sparaPallaDiCannone)
+
+    local pivotJoint = physics.newJoint( "pivot", cannone, pallaDiCannone, pallaDiCannone.x, pallaDiCannone.y )
 
     scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 400, 300 )
     scimmia.x=display.contentCenterX-900
@@ -128,6 +132,7 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         physics.start()
+        ruotaCannone()
 	end
 end
 
@@ -142,8 +147,7 @@ function scene:hide( event )
 		-- Code here runs when the scene is on screen (but is about to go off screen)
 
 	elseif ( phase == "did" ) then
-		-- Code here runs immediately after the scene goes entirely off screen
-
+        -- Code here runs immediately after the scene goes entirely off screen
 	end
 end
 

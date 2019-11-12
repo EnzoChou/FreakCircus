@@ -108,20 +108,20 @@ local function colpito( event )
         local obj1 = event.object1
         local obj2 = event.object2
 
-        local midX = ( event.object1.x + event.object2.x ) * 0.5
-        local midY = ( event.object1.y + event.object2.y ) * 0.5
+        local midX = ( obj1.x + obj2.x ) * 0.5
+        local midY = ( obj1.y + obj2.y ) * 0.5
 
-        if ( ( obj1.myName == "bersaglio2" and obj2.myName == "pallaDiCannone" ) or
-            ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio2" ) )
+        if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
+            ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
             bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
             bucoBersaglio.x = midX
-            bucoBersaglio.y = midy
+            bucoBersaglio.y = midY
         end
     end
 end
 
-Runtime:addEventListener( "collision", colpito )
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -160,6 +160,7 @@ function scene:create( event )
     bersaglio2 = display.newImageRect( mainGroup, oggettiDiScena, 5, 200, 300 )
     bersaglio2.x = display.contentCenterX+800
     bersaglio2.y = display.contentHeight-270
+    bersaglio2.myName="bersaglio"
     physics.addBody( bersaglio2, "static" )
 
     --bersaglio = display.newImageRect( mainGroup, oggettiDiScena, 2, 400, 300 )
@@ -170,6 +171,7 @@ function scene:create( event )
     pallaDiCannone = display.newImageRect( mainGroup, oggettiDiScena2, 1, 100, 100 )
     pallaDiCannone.x = display.contentCenterX-550
     pallaDiCannone.y = display.contentHeight-360
+    pallaDiCannone.myName="pallaDiCannone"
     physics.addBody( pallaDiCannone,"dynamic",{ radius=30, bounce=0.3,density=10 } )
 
     cannone = display.newImageRect( mainGroup, oggettiDiScena, 1, 400,300 )
@@ -202,6 +204,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         ruotaCannone()
+        Runtime:addEventListener( "collision", colpito )
 	end
 end
 

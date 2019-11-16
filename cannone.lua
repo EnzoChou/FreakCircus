@@ -78,6 +78,7 @@ local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOpt
 
 local cannone
 local pallaDiCannone
+local bucoBersaglio
 local bersaglio
 local bersaglio1
 local bersaglio2
@@ -87,6 +88,7 @@ local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
 local impulso= 600;
 
+local roundTripDelay = 5000 -- 5 sec
 
 local function sparaPallaDiCannone()
     cannone:removeEventListener("tap",sparaPallaDiCannone)
@@ -96,10 +98,74 @@ local function sparaPallaDiCannone()
     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloCannone), -impulso*math.sin(angoloCannone), pallaDiCannone.x, pallaDiCannone.y )
 end
 
-local function ruotaCannone()
-    transition.to(cannone,{rotation=-60,time=5000})
-    transition.to(pallaDiCannone,{rotation=-60,time=5000})
+
+--rotazione cannone
+
+local function ruotaCannoneOrario()
+    transition.to(cannone,{rotation=0,time=roundTripDelay/2})
+    transition.to(pallaDiCannone,{rotation=0,time=roundTripDelay/2})
 end
+
+local function ruotaCannoneAntiOrario()
+    transition.to(cannone,{rotation=-60,time=roundTripDelay/2,onComplete = function() ruotaCannoneOrario() end })
+    transition.to(pallaDiCannone,{rotation=-60,time=roundTripDelay/2})
+end
+
+local function ruotaCannone()
+    ruotaCannoneAntiOrario()
+    timer.performWithDelay(roundTripDelay, ruotaCannoneAntiOrario, 0 )
+end
+
+
+
+--movimento bersaglio
+
+local function muoviBersaglioADestra()
+    transition.to(bersaglio2,{x=bersaglio2.x+300,time=roundTripDelay/2})
+    transition.to(bersaglio1,{x=bersaglio1.x+300,time=roundTripDelay/2 })
+    if(bucoBersaglio ~= nil) then 
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+300,time=roundTripDelay/2}) 
+    end
+end
+
+local function muoviBersaglioASinistra()
+    transition.to(bersaglio1,{x=bersaglio1.x-300,time=roundTripDelay/2})
+    transition.to(bersaglio2,{x=bersaglio2.x-300,time=roundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
+    if(bucoBersaglio ~= nil) then 
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x-300,time=roundTripDelay/2}) 
+    end
+end
+
+local function muoviBersaglio()
+    muoviBersaglioASinistra()
+    timer.performWithDelay(roundTripDelay, muoviBersaglioASinistra, 0 )
+end
+
+
+
+
+local function riposizionaPallaDiCannone()
+    cannone.rotation=0
+    pallaDiCannone.x = display.contentCenterX-550
+    pallaDiCannone.y = display.contentHeight-360
+    cannone.isBodyActive=true
+    local pivotJoint = physics.newJoint( "pivot", cannone, pallaDiCannone, pallaDiCannone.x, pallaDiCannone.y )
+    cannone:addEventListener("tap",sparaPallaDiCannone)
+
+end
+
+
+local function gameLoop()
+
+    --Se la palla esce fuori dallo schermo riposizionala
+    if ( pallaDiCannone.x > display.contentWidth*2 + 100 or
+         pallaDiCannone.y < -100 )
+    then
+            riposizionaPallaDiCannone()
+            print("palla fuori schermo")
+    end
+end
+
 
 local function colpito( event )
 
@@ -114,9 +180,12 @@ local function colpito( event )
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
+            transition.pause()
+            display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
             bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
             bucoBersaglio.x = midX
             bucoBersaglio.y = midY
+            timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
     end
 end
@@ -204,6 +273,8 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         ruotaCannone()
+        muoviBersaglio()
+        timer.performWithDelay(500,gameLoop,0)
         Runtime:addEventListener( "collision", colpito )
 	end
 end

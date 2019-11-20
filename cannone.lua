@@ -176,6 +176,26 @@ local function gameLoop()
     end
 end
 
+local function valore( valoreYcolpito, valoreYBersaglio )
+    local accuracy = math.abs((valoreYcolpito-valoreYBersaglio)/50)
+    local integralPart, fractionalPart = math.modf(accuracy)
+    local risultato
+    if ( integralPart< 1 )
+        then risultato = 120
+    elseif ( integralPart<2 )
+        then risultato = 100
+    elseif ( integralPart<3 )
+        then risultato = 80
+    elseif ( integralPart<4 )
+        then risultato = 60
+    elseif ( integralPart<5 )
+        then risultato = 40
+    else
+        risultato = accuracy
+    end
+    return risultato
+end
+
 
 local function colpito( event )
 
@@ -184,18 +204,19 @@ local function colpito( event )
         local obj1 = event.object1
         local obj2 = event.object2
 
-        local midX = ( obj1.x + obj2.x ) * 0.5
-        local midY = ( obj1.y + obj2.y ) * 0.5
+        --local midX = ( obj1.x + obj2.x ) * 0.5
+        --local midY = ( obj1.y + obj2.y ) * 0.5
 
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
             transition.pause()
+            local risultato = valore( obj2.y, obj1.y )
             display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
             bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
             bucoBersaglio.x = obj2.x
             bucoBersaglio.y = obj2.y
-            -- punti = punti + valore
+            punti = punti + risultato
             puntiText.text = "Punteggio: " .. punti
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end

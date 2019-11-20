@@ -76,6 +76,8 @@ local oggettiDiScena = graphics.newImageSheet( "images/oggettoni.png", sheetOpti
 local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
 
+local punti = 0
+
 local cannone
 local pallaDiCannone
 local bucoBersaglio
@@ -84,11 +86,19 @@ local bersaglio1
 local bersaglio2
 local pavimento
 local scimmia
+local puntiText
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
 local impulso= 600;
 
 local roundTripDelay = 5000 -- 5 sec
+
+
+-- punteggio
+local function aggiornaText()
+    puntiText.text = "Punteggio: " .. punti
+end
+
 
 local function sparaPallaDiCannone()
     cannone:removeEventListener("tap",sparaPallaDiCannone)
@@ -123,16 +133,16 @@ end
 local function muoviBersaglioADestra()
     transition.to(bersaglio2,{x=bersaglio2.x+300,time=roundTripDelay/2})
     transition.to(bersaglio1,{x=bersaglio1.x+300,time=roundTripDelay/2 })
-    if(bucoBersaglio ~= nil) then 
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x+300,time=roundTripDelay/2}) 
+    if(bucoBersaglio ~= nil) then
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+300,time=roundTripDelay/2})
     end
 end
 
 local function muoviBersaglioASinistra()
     transition.to(bersaglio1,{x=bersaglio1.x-300,time=roundTripDelay/2})
     transition.to(bersaglio2,{x=bersaglio2.x-300,time=roundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
-    if(bucoBersaglio ~= nil) then 
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x-300,time=roundTripDelay/2}) 
+    if(bucoBersaglio ~= nil) then
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x-300,time=roundTripDelay/2})
     end
 end
 
@@ -183,8 +193,10 @@ local function colpito( event )
             transition.pause()
             display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
             bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
-            bucoBersaglio.x = midX
-            bucoBersaglio.y = midY
+            bucoBersaglio.x = obj2.x
+            bucoBersaglio.y = obj2.y
+            -- punti = punti + valore
+            puntiText.text = "Punteggio: " .. punti
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
     end
@@ -256,6 +268,8 @@ function scene:create( event )
     scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 400, 300 )
     scimmia.x=display.contentCenterX-900
     scimmia.y=display.contentHeight-270
+
+    puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
 
 end
 

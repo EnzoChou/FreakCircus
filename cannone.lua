@@ -191,7 +191,7 @@ local function valore( valoreYcolpito, valoreYBersaglio )
     elseif ( integralPart<5 )
         then risultato = 40
     else
-        risultato = accuracy
+        risultato = 0
     end
     return risultato
 end

@@ -177,19 +177,17 @@ local function gameLoop()
 end
 
 local function valore( valoreYcolpito, valoreYBersaglio )
-    local accuracy = math.abs((valoreYcolpito-valoreYBersaglio)/50)
+    local accuracy = math.abs((valoreYcolpito-valoreYBersaglio)/30)
     local integralPart, fractionalPart = math.modf(accuracy)
     local risultato
-    if ( integralPart< 1 )
+    if ( integralPart< 0.5 )
         then risultato = 120
-    elseif ( integralPart<2 )
+    elseif ( integralPart<1.5 )
         then risultato = 100
-    elseif ( integralPart<3 )
+    elseif ( integralPart<2.5 )
         then risultato = 80
-    elseif ( integralPart<4 )
+    elseif ( integralPart<3.5 )
         then risultato = 60
-    elseif ( integralPart<5 )
-        then risultato = 40
     else
         risultato = 0
     end

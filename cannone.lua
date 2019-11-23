@@ -92,7 +92,8 @@ local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
 local impulso= 600;
 
-local roundTripDelay = 5000 -- 5 sec
+local bersaglioRoundTripDelay = 3000 --5 sec
+local cannoneRoundTripDelay = 3000 -- 3 sec
 
 
 -- punteggio
@@ -113,43 +114,45 @@ end
 --rotazione cannone
 
 local function ruotaCannoneOrario()
-    transition.to(cannone,{rotation=0,time=roundTripDelay/2})
-    transition.to(pallaDiCannone,{rotation=0,time=roundTripDelay/2})
+    transition.to(cannone,{rotation=0,time=cannoneRoundTripDelay/2})
+    transition.to(pallaDiCannone,{rotation=0,time=cannoneRoundTripDelay/2})
 end
 
 local function ruotaCannoneAntiOrario()
-    transition.to(cannone,{rotation=-60,time=roundTripDelay/2,onComplete = function() ruotaCannoneOrario() end })
-    transition.to(pallaDiCannone,{rotation=-60,time=roundTripDelay/2})
+    transition.to(cannone,{rotation=-60,time=cannoneRoundTripDelay/2,onComplete = function() ruotaCannoneOrario() end })
+    transition.to(pallaDiCannone,{rotation=-60,time=cannoneRoundTripDelay/2})
 end
 
 local function ruotaCannone()
     ruotaCannoneAntiOrario()
-    timer.performWithDelay(roundTripDelay, ruotaCannoneAntiOrario, 0 )
+    timer.performWithDelay(cannoneRoundTripDelay, ruotaCannoneAntiOrario, 0 )
 end
 
 
 
 --movimento bersaglio
 
+local spostamento = 200
+
 local function muoviBersaglioADestra()
-    transition.to(bersaglio2,{x=bersaglio2.x+300,time=roundTripDelay/2})
-    transition.to(bersaglio1,{x=bersaglio1.x+300,time=roundTripDelay/2 })
+    transition.to(bersaglio2,{x=display.contentCenterX+800+spostamento,time=bersaglioRoundTripDelay/2})
+    transition.to(bersaglio1,{x=display.contentCenterX+600+spostamento,time=bersaglioRoundTripDelay/2 })
     if(bucoBersaglio ~= nil) then
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x+300,time=roundTripDelay/2})
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+800-bersaglio2.x+spostamento),time=bersaglioRoundTripDelay/2})
     end
 end
 
 local function muoviBersaglioASinistra()
-    transition.to(bersaglio1,{x=bersaglio1.x-300,time=roundTripDelay/2})
-    transition.to(bersaglio2,{x=bersaglio2.x-300,time=roundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
+    transition.to(bersaglio1,{x=display.contentCenterX+600-spostamento,time=bersaglioRoundTripDelay/2})
+    transition.to(bersaglio2,{x=display.contentCenterX+800-spostamento,time=bersaglioRoundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
     if(bucoBersaglio ~= nil) then
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x-300,time=roundTripDelay/2})
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+800-bersaglio2.x-spostamento),time=bersaglioRoundTripDelay/2})
     end
 end
 
 local function muoviBersaglio()
     muoviBersaglioASinistra()
-    timer.performWithDelay(roundTripDelay, muoviBersaglioASinistra, 0 )
+    timer.performWithDelay(bersaglioRoundTripDelay, muoviBersaglioASinistra, 0 )
 end
 
 

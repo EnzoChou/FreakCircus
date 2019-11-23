@@ -222,6 +222,13 @@ local function colpito( event )
             puntiText.text = "Punteggio: " .. punti
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
+
+        if ( ( obj1.myName == "pavimento" and obj2.myName == "pallaDiCannone" ) or
+        ( obj1.myName == "pallaDiCannone" and obj2.myName == "pavimento" ) )
+        then
+            transition.pause()
+            timer.performWithDelay( 500, riposizionaPallaDiCannone )
+        end
     end
 end
 
@@ -255,6 +262,7 @@ function scene:create( event )
     pavimento = display.newImageRect( mainGroup, oggettiDiScena3, 1, 3000, 200 )
     pavimento.x = display.contentCenterX
     pavimento.y = display.contentHeight-50
+    pavimento.myName = "pavimento"
     physics.addBody( pavimento, "static" )
 
     bersaglio1 = display.newImageRect( mainGroup, oggettiDiScena, 4, 200, 300 )

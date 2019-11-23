@@ -7,6 +7,7 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local physics = require( "physics" )
+physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
 
 local sheetOptions = {
@@ -212,8 +213,8 @@ local function colpito( event )
             local risultato = valore( obj2.y, obj1.y )
             display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
             bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
-            bucoBersaglio.x = obj2.x
-            bucoBersaglio.y = obj2.y
+            bucoBersaglio.x = event.x
+            bucoBersaglio.y = event.y
             punti = punti + risultato
             puntiText.text = "Punteggio: " .. punti
             timer.performWithDelay( 500, riposizionaPallaDiCannone )

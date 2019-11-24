@@ -184,22 +184,23 @@ local function formatTime(seconds)
 end
 
 
+local function endGame()
+    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+end
+
+
 local function updateTime()
     secondsLeft = secondsLeft - 1
     clockText.text = formatTime(secondsLeft)
 
     --se il tempo è scaduto
     if(secondsLeft==0) then
+        cannone:removeEventListener("tap",sparaPallaDiCannone)
         timer.cancel( gameLoopTimer )
         local endDelay = 2000
         mostraScritta("Tempo scaduto",endDelay)
         timer.performWithDelay(endDelay, endGame)
     end
-end
-
-
-local function endGame()
-    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
 end
 
 
@@ -213,7 +214,6 @@ local function gameLoop()
             print("palla fuori schermo")
     end
 end
-
 
 
 -- calcola punteggio

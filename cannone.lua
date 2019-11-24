@@ -101,6 +101,11 @@ local function aggiornaText()
     puntiText.text = "Punteggio: " .. punti
 end
 
+local function mostraScritta(text)
+    local scritta = display.newText( uiGroup, text, 300, 500, native.systemFont, 150 )
+    timer.performWithDelay(500,function () display.remove(scritta) end)
+end
+
 
 local function sparaPallaDiCannone()
     cannone:removeEventListener("tap",sparaPallaDiCannone)
@@ -212,6 +217,7 @@ local function colpito( event )
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
+            mostraScritta("COLPITO")
             transition.pause()
             local risultato = valore( obj2.y, obj1.y )
 

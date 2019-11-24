@@ -87,8 +87,11 @@ local bersaglio1
 local bersaglio2
 local pavimento
 local scimmia
-local puntiText
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
+
+local secondsLeft = 180 -- 3 minuti
+local puntiText
+local clockText
 
 local impulso= 550;
 
@@ -101,9 +104,9 @@ local function aggiornaText()
     puntiText.text = "Punteggio: " .. punti
 end
 
-local function mostraScritta(text)
+local function mostraScritta(text,delay)
     local scritta = display.newText( uiGroup, text, 300, 500, native.systemFont, 150 )
-    timer.performWithDelay(500,function () display.remove(scritta) end)
+    timer.performWithDelay(delay,function () display.remove(scritta) end)
 end
 
 
@@ -174,8 +177,34 @@ local function riposizionaPallaDiCannone()
 end
 
 
-local function gameLoop()
+local function formatTime(seconds)
+    local minutes = math.floor( seconds / 60 )
+    local seconds = seconds % 60
+    return string.format( "%02d:%02d", minutes, seconds )
+end
 
+
+local function updateTime()
+    secondsLeft = secondsLeft - 1
+    clockText.text = formatTime(secondsLeft)
+
+    --se il tempo è scaduto
+    if(secondsLeft==0) then
+        timer.cancel( gameLoopTimer )
+        local endDelay = 2000
+        mostraScritta("Tempo scaduto",endDelay)
+        timer.performWithDelay(endDelay, endGame)
+    end
+end
+
+
+local function endGame()
+    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+end
+
+
+local function gameLoop()
+    updateTime()
     --Se la palla esce fuori dallo schermo riposizionala
     if ( pallaDiCannone.x > display.contentWidth*2 + 100 or
          pallaDiCannone.y < -100 )
@@ -185,6 +214,9 @@ local function gameLoop()
     end
 end
 
+
+
+-- calcola punteggio
 local function valore( valoreYcolpito, valoreYBersaglio )
     local accuracy = math.abs((valoreYcolpito-valoreYBersaglio)/30)
     local integralPart, fractionalPart = math.modf(accuracy)
@@ -204,6 +236,7 @@ local function valore( valoreYcolpito, valoreYBersaglio )
 end
 
 
+
 local function colpito( event )
 
     if ( event.phase == "began" ) then
@@ -217,7 +250,7 @@ local function colpito( event )
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
-            mostraScritta("COLPITO")
+            mostraScritta("COLPITO",1000)
             transition.pause()
             local risultato = valore( obj2.y, obj1.y )
 
@@ -313,6 +346,7 @@ function scene:create( event )
     scimmia.y=display.contentHeight-290
 
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
+    clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
 
 end
 
@@ -331,7 +365,7 @@ function scene:show( event )
         physics.start()
         ruotaCannone()
         muoviBersaglio()
-        timer.performWithDelay(500,gameLoop,0)
+        gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
         Runtime:addEventListener( "collision", colpito )
 	end
 end
@@ -344,10 +378,13 @@ function scene:hide( event )
 	local phase = event.phase
 
 	if ( phase == "will" ) then
-		-- Code here runs when the scene is on screen (but is about to go off screen)
-
+        -- Code here runs when the scene is on screen (but is about to go off screen)
+        Runtime:removeEventListener( "collision", onCollision )
+        transition.pause()
+        physics.pause()
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
+		composer.removeScene( "cannone" )
 	end
 end
 

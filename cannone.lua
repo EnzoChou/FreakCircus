@@ -90,9 +90,9 @@ local scimmia
 local puntiText
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local impulso= 600;
+local impulso= 550;
 
-local bersaglioRoundTripDelay = 3000 --5 sec
+local bersaglioRoundTripDelay = 2000 --5 sec
 local cannoneRoundTripDelay = 3000 -- 3 sec
 
 
@@ -135,18 +135,18 @@ end
 local spostamento = 200
 
 local function muoviBersaglioADestra()
-    transition.to(bersaglio2,{x=display.contentCenterX+800+spostamento,time=bersaglioRoundTripDelay/2})
+    transition.to(bersaglio2,{x=display.contentCenterX+750+spostamento,time=bersaglioRoundTripDelay/2})
     transition.to(bersaglio1,{x=display.contentCenterX+600+spostamento,time=bersaglioRoundTripDelay/2 })
     if(bucoBersaglio ~= nil) then
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+800-bersaglio2.x+spostamento),time=bersaglioRoundTripDelay/2})
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+750-bersaglio2.x+spostamento),time=bersaglioRoundTripDelay/2})
     end
 end
 
 local function muoviBersaglioASinistra()
     transition.to(bersaglio1,{x=display.contentCenterX+600-spostamento,time=bersaglioRoundTripDelay/2})
-    transition.to(bersaglio2,{x=display.contentCenterX+800-spostamento,time=bersaglioRoundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
+    transition.to(bersaglio2,{x=display.contentCenterX+750-spostamento,time=bersaglioRoundTripDelay/2,onComplete = function() muoviBersaglioADestra() end})
     if(bucoBersaglio ~= nil) then
-        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+800-bersaglio2.x-spostamento),time=bersaglioRoundTripDelay/2})
+        transition.to(bucoBersaglio,{x=bucoBersaglio.x+(display.contentCenterX+750-bersaglio2.x-spostamento),time=bersaglioRoundTripDelay/2})
     end
 end
 
@@ -214,12 +214,17 @@ local function colpito( event )
         then
             transition.pause()
             local risultato = valore( obj2.y, obj1.y )
-            display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
-            bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 48, 63 )
-            bucoBersaglio.x = event.x
-            bucoBersaglio.y = event.y
-            punti = punti + risultato
-            puntiText.text = "Punteggio: " .. punti
+
+            if risultato~=0
+            then
+                display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
+                bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 32, 42 )
+                bucoBersaglio.x = event.x
+                bucoBersaglio.y = event.y
+                punti = punti + risultato
+                puntiText.text = "Punteggio: " .. punti
+            end
+
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
 
@@ -227,6 +232,7 @@ local function colpito( event )
         ( obj1.myName == "pallaDiCannone" and obj2.myName == "pavimento" ) )
         then
             transition.pause()
+            pallaDiCannone:setLinearVelocity(0,-100) -- la palla rimbalza di poco quando colpisce il pavimento (evita effetto sponda per colpire il bersaglio)
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
     end
@@ -265,13 +271,13 @@ function scene:create( event )
     pavimento.myName = "pavimento"
     physics.addBody( pavimento, "static" )
 
-    bersaglio1 = display.newImageRect( mainGroup, oggettiDiScena, 4, 200, 300 )
+    bersaglio1 = display.newImageRect( mainGroup, oggettiDiScena, 4, 150, 200 )
     bersaglio1.x = display.contentCenterX+600
-    bersaglio1.y = display.contentHeight-270
+    bersaglio1.y = display.contentHeight-250
 
-    bersaglio2 = display.newImageRect( mainGroup, oggettiDiScena, 5, 200, 300 )
-    bersaglio2.x = display.contentCenterX+800
-    bersaglio2.y = display.contentHeight-270
+    bersaglio2 = display.newImageRect( mainGroup, oggettiDiScena, 5, 150, 200 )
+    bersaglio2.x = display.contentCenterX+750
+    bersaglio2.y = display.contentHeight-250
     bersaglio2.myName="bersaglio"
     physics.addBody( bersaglio2, "static" )
 
@@ -280,13 +286,13 @@ function scene:create( event )
     --bersaglio.y = display.contentHeight-270
     --physics.addBody( bersaglio,"static" )
 
-    pallaDiCannone = display.newImageRect( mainGroup, oggettiDiScena2, 1, 100, 100 )
-    pallaDiCannone.x = display.contentCenterX-550
-    pallaDiCannone.y = display.contentHeight-360
+    pallaDiCannone = display.newImageRect( mainGroup, oggettiDiScena2, 1, 75, 75 )
+    pallaDiCannone.x = display.contentCenterX-600
+    pallaDiCannone.y = display.contentHeight-290
     pallaDiCannone.myName="pallaDiCannone"
-    physics.addBody( pallaDiCannone,"dynamic",{ radius=30, bounce=0.3,density=10 } )
+    physics.addBody( pallaDiCannone,"dynamic",{ radius=30, bounce=0.3,density=8 } )
 
-    cannone = display.newImageRect( mainGroup, oggettiDiScena, 1, 400,300 )
+    cannone = display.newImageRect( mainGroup, oggettiDiScena, 1, 300,200 )
     cannone.x=display.contentCenterX-750
     cannone.y=display.contentHeight-130
     cannone.anchorX =  130/321 --175,642/321
@@ -296,9 +302,9 @@ function scene:create( event )
 
     local pivotJoint = physics.newJoint( "pivot", cannone, pallaDiCannone, pallaDiCannone.x, pallaDiCannone.y )
 
-    scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 400, 300 )
+    scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 300, 300 )
     scimmia.x=display.contentCenterX-900
-    scimmia.y=display.contentHeight-270
+    scimmia.y=display.contentHeight-290
 
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
 

@@ -84,6 +84,7 @@ function scene:create( event )
       giocoliereButton:setFillColor( 1, 1, 1 )
 
   playButton:addEventListener( "tap", gotoGiochi )
+  cannoneButton:addEventListener( "tap", gotoCannone )
 end
 
 

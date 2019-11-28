@@ -37,24 +37,6 @@ local function gotoGiocoliere()
     composer.gotoScene( "giocoliere" , { time=800, effect="crossFade" } )
 end
 
-local function aggiungiGiochiListener()
-    cannoneButton:addEventListener( "tap", gotoCannone )
-    giocoliereButton:addEventListener( "tap", gotoGiocoliere )
-end
-
-local function rimuoviGiochiListener()
-    cannoneButton:removeEventListener( "tap", gotoCannone )
-    giocoliereButton:RemoveEventListener( "tap", gotoGiocoliere )
-end
-
-local function aggiungiprincipaleListener()
-    playButton:addEventListener( "tap", gotoGiochi )
-end
-
-local function rimuoviPrincipaleListener()
-    playButton:removeEventListener( "tap", gotoGiochi )
-end
-
 local function giochiInScena()
     transition.to( giochiGroup, { time = 1000, transition = easing.inOutElastic,
                                   x=0 } )
@@ -77,6 +59,7 @@ local function tornaMenuPrincipale()
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                     x = 3000,
                                     onStart = menuPrincipale } )
+        gruppoInScena = principaleGroup
     end
 end
 

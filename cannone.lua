@@ -219,15 +219,14 @@ end
 -- calcola punteggio
 local function valore( valoreYcolpito, valoreYBersaglio )
     local accuracy = math.abs((valoreYcolpito-valoreYBersaglio)/30)
-    local integralPart, fractionalPart = math.modf(accuracy)
     local risultato
-    if ( integralPart< 0.5 )
+    if ( accuracy< 0.5 )
         then risultato = 120
-    elseif ( integralPart<1.5 )
+    elseif ( accuracy<1.5 )
         then risultato = 100
-    elseif ( integralPart<2.5 )
+    elseif ( accuracy<2.5 )
         then risultato = 80
-    elseif ( integralPart<3.5 )
+    elseif ( accuracy<3.5 )
         then risultato = 60
     else
         risultato = 0

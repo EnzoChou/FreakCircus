@@ -28,13 +28,25 @@ local giocoliereButton
 
 -- bottone indietro
 local indietroButton
+local toggleIndietroOnOff = 0
+
 
 local function gotoCannone()
-    composer.gotoScene( "cannone" , { time=800, effect="crossFade" } )
+    composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
 end
 
 local function gotoGiocoliere()
-    composer.gotoScene( "giocoliere" , { time=800, effect="crossFade" } )
+    composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
+end
+
+local function toggleIndietroButton()
+    if ( toggleIndietroOnOff == 0 ) then
+        transition.to( indietroButton, { time = 1000, effect = "fadeIn", alpha = 1 } )
+        toggleIndietroOnOff = 1
+    else
+        transition.to( indietroButton, { time = 1000, effect = "fadeOut", alpha = 0 } )
+        toggleIndietroOnOff = 0
+    end
 end
 
 local function giochiInScena()
@@ -46,7 +58,12 @@ end
 local function gotoGiochi()
     transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
                                       x = -3000,
-                                      onStart=giochiInScena } )
+                                      onStart = giochiInScena,
+                                      onComplete = toggleIndietroButton() } )
+end
+
+local function gotoImpostazioni()
+
 end
 
 local function menuPrincipale()
@@ -60,6 +77,7 @@ local function tornaMenuPrincipale()
                                     x = 3000,
                                     onStart = menuPrincipale } )
         gruppoInScena = principaleGroup
+        toggleIndietroButton()
     end
 end
 
@@ -117,8 +135,10 @@ function scene:create( event )
   -- bottone indietro al menu principale
   indietroButton = display.newText( backGroup, "Indietro", -500, 150, native.systemFont, 100 )
       indietroButton:setFillColor( 1, 1, 1 )
+      indietroButton.alpha = 0
 
   playButton:addEventListener( "tap", gotoGiochi )
+  impostazioniButton:addEventListener( "tap", gotoImpostazioni )
   cannoneButton:addEventListener( "tap", gotoCannone )
   giocoliereButton:addEventListener( "tap", gotoGiocoliere )
   indietroButton:addEventListener( "tap", tornaMenuPrincipale )

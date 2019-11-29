@@ -123,7 +123,7 @@ local sheetOptions4 = {
 local oggettiDiScena = graphics.newImageSheet( "images/giocoliere.png", sheetOptions )
 local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
-local sheetOptions4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
+local oggettiDiScena4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
 
 local punti = 0
 
@@ -189,9 +189,8 @@ end
 
 
 local function piazzamentoNuovaPallina()
-    cannone.rotation=0
-    pallina.x =
-    pallina.y =
+    pallina.x = 0
+    pallina.y = 0
     pallina.isBodyActive=true
     cannone:addEventListener("tap",lanciaPallina)
 end
@@ -274,7 +273,7 @@ function scene:create( event )
     pavimento.myName = "pavimento"
     physics.addBody( pavimento, "static" )
 
-    scimmia = display.newImageRect( mainGroup, oggettiDiScena, 3, 300, 300 )
+    scimmia = display.newImageRect( mainGroup, oggettiDiScena4, 3, 300, 300 )
     scimmia.x=display.contentCenterX-900
     scimmia.y=display.contentHeight-290
 

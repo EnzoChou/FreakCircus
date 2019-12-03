@@ -124,18 +124,23 @@ local oggettiDiScena = graphics.newImageSheet( "images/giocoliere.png", sheetOpt
 local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
 local oggettiDiScena4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
+local sheetGiocoliere = graphics.newImageSheet("images/giocoliere.png", sheetOptions )
 
 local punti = 0
 
 local giocoliere
-local giocoliere1
-local giocoliere2
-local giocoliere3
-local giocoliere4
-local giocoliere5
-local giocoliere6
-local giocoliere7
-local giocoliere8
+local sequenzaGiocoliere = {
+    {
+        name = "movimento braccia",
+        start = 1,
+        count = 7,
+        time = 1500,
+        loopCount = 0,
+        loopDirection = "forward"
+    }
+}
+
+
 local pallina
 local pallina1
 local pallina2
@@ -166,34 +171,34 @@ local function mostraScritta(text,delay)
 end
 
 
-local function lanciaPallina()
-    cannone:removeEventListener("tap", lanciaPallina)
-    display.remove( pivotJoint )
-    cannone.isBodyActive = false
-    angoloPallina = math.pi/6 - cannone.rotation*math.pi/180
-    pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloPallina), -impulso*math.sin(angoloPallina), pallaDiCannone.x, pallaDiCannone.y )
-end
+-- local function lanciaPallina()
+--     cannone:removeEventListener("tap", lanciaPallina)
+--     +display.remove( pivotJoint )
+--     cannone.isBodyActive = false
+--     angoloPallina = math.pi/6 - cannone.rotation*math.pi/180
+--     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloPallina), -impulso*math.sin(angoloPallina), pallaDiCannone.x, pallaDiCannone.y )
+-- end
 
 
---movimento giocoliere
+-- --movimento giocoliere
 
-local spostamento = 200
+-- local spostamento = 200
 
-local function muoviGiocoliereADestra()
+-- local function muoviGiocoliereADestra()
 
-end
+-- end
 
-local function muoviGiocoliereASinistra()
+-- local function muoviGiocoliereASinistra()
 
-end
+-- end
 
 
-local function piazzamentoNuovaPallina()
-    pallina.x = 0
-    pallina.y = 0
-    pallina.isBodyActive=true
-    cannone:addEventListener("tap",lanciaPallina)
-end
+-- local function piazzamentoNuovaPallina()
+--     pallina.x = 0
+--     pallina.y = 0
+--     pallina.isBodyActive=true
+--     cannone:addEventListener("tap",lanciaPallina)
+-- end
 
 
 local function formatTime(seconds)
@@ -236,9 +241,9 @@ end
 
 
 
-local function pallinaPresa( event )
+-- local function pallinaPresa( event )
 
-end
+-- end
 
 
 -- -----------------------------------------------------------------------------------
@@ -280,6 +285,10 @@ function scene:create( event )
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
 
+    giocoliere = display.newSprite( mainGroup,sheetGiocoliere, sequenzaGiocoliere )
+    giocoliere.x = display.contentCenterX
+    giocoliere.y = display.contentHeight - 420
+    giocoliere:scale(1.5,1.5)
 end
 
 
@@ -296,6 +305,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+        giocoliere:play()
 	end
 end
 
@@ -308,7 +318,6 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        transition.pause()
         physics.pause()
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen

@@ -124,7 +124,6 @@ local oggettiDiScena = graphics.newImageSheet( "images/giocoliere.png", sheetOpt
 local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
 local oggettiDiScena4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
-local sheetGiocoliere = graphics.newImageSheet("images/giocoliere.png", sheetOptions )
 
 local punti = 0
 
@@ -133,7 +132,7 @@ local sequenzaGiocoliere = {
     {
         name = "movimento braccia",
         start = 1,
-        count = 7,
+        count = 8,
         time = 1500,
         loopCount = 0,
         loopDirection = "forward"
@@ -141,24 +140,13 @@ local sequenzaGiocoliere = {
 }
 
 
-local pallina
-local pallina1
-local pallina2
-local pallina3
-local pallina4
-local pallina5
+local palline = {}
 local pavimento
 local scimmia
 
 local secondsLeft = 180 -- 3 minuti
 local puntiText
 local clockText
-
-local impulso= 550;
-
-local giocoliereRoundTripDelay = 2000 --5 sec
-local pallinaRoundTripDelay = 3000 -- 3 sec
-
 
 -- punteggio
 local function aggiornaText()
@@ -171,34 +159,103 @@ local function mostraScritta(text,delay)
 end
 
 
--- local function lanciaPallina()
---     cannone:removeEventListener("tap", lanciaPallina)
---     +display.remove( pivotJoint )
---     cannone.isBodyActive = false
---     angoloPallina = math.pi/6 - cannone.rotation*math.pi/180
---     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloPallina), -impulso*math.sin(angoloPallina), pallaDiCannone.x, pallaDiCannone.y )
--- end
+-- calcola punteggio
+local function valore(  )
+
+end
 
 
--- --movimento giocoliere
 
--- local spostamento = 200
+-- metodi pallina
 
--- local function muoviGiocoliereADestra()
+local function precipitaPallina(pallina)
+    pallina.x = math.random(display.contentCenterX-1000,display.contentCenterX+1000)
 
--- end
-
--- local function muoviGiocoliereASinistra()
-
--- end
+    -- la pallina cade per la gravità
+    physics.addBody(pallina,"dynamic",{radius=50})
+end
 
 
--- local function piazzamentoNuovaPallina()
---     pallina.x = 0
---     pallina.y = 0
---     pallina.isBodyActive=true
---     cannone:addEventListener("tap",lanciaPallina)
--- end
+local function lanciaPallina()
+    local pallina = display.newImageRect(mainGroup,oggettiDiScena2,math.random(1,5),50,50)
+    pallina.myName = "pallina"
+    table.insert(palline,pallina)
+    pallina.x = giocoliere.x+100
+    pallina.y = display.contentHeight-500
+
+    transition.to(pallina,{y=-40,time=700}) -- lancia pallina
+
+    timer.performWithDelay(5000,function () precipitaPallina(pallina) end,1)
+end
+
+local function isPallinaPresa(pallina)
+    --TODO
+    return true
+end
+
+local function rimuoviPallina(pallina)
+    display.remove(pallina)
+    table.remove(pallina)
+end
+
+
+
+-- movimento giocoliere
+
+local function muoviGiocoliere( event )
+ 
+    localgiocoliere = event.target
+    local phase = event.phase
+ 
+    if ( "began" == phase ) then
+       display.currentStage:setFocus(giocoliere )
+       giocoliere.touchOffsetX = event.x -giocoliere.x
+    elseif ( "moved" == phase ) then
+       giocoliere.x = event.x -giocoliere.touchOffsetX
+ 
+    elseif ( "ended" == phase or "cancelled" == phase ) then
+        display.currentStage:setFocus( nil )
+    end
+    return true
+end
+
+
+
+
+local function colpito( event )
+
+    if ( event.phase == "began" ) then
+
+        local obj1 = event.object1
+        local obj2 = event.object2
+
+        if ( ( obj1.myName == "giocoliere" and obj2.myName == "pallina" ) or
+            ( obj1.myName == "pallina" and obj2.myName == "giocoliere" ) )
+        then
+            local pallina = obj2
+            if(obj1.myName=="pallina") then
+                pallina=obj1
+            end
+
+            if(isPallinaPresa(pallina)) then
+                rimuoviPallina(pallina)
+            end
+        end
+
+        if ( ( obj1.myName == "pavimento" and obj2.myName == "pallina" ) or
+        ( obj1.myName == "pallina" and obj2.myName == "pavimento" ) )
+        then
+            local pallina = obj2
+            if(obj1.myName=="pallina") then
+                pallina=obj1
+            end 
+            rimuoviPallina(pallina)
+        end
+    end
+end
+
+
+
 
 
 local function formatTime(seconds)
@@ -230,21 +287,7 @@ end
 
 local function gameLoop()
     updateTime()
-
 end
-
-
--- calcola punteggio
-local function valore(  )
-
-end
-
-
-
--- local function pallinaPresa( event )
-
--- end
-
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -285,10 +328,13 @@ function scene:create( event )
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
 
-    giocoliere = display.newSprite( mainGroup,sheetGiocoliere, sequenzaGiocoliere )
+    giocoliere = display.newSprite( mainGroup,oggettiDiScena, sequenzaGiocoliere )
     giocoliere.x = display.contentCenterX
     giocoliere.y = display.contentHeight - 420
+    giocoliere.myName = "giocoliere"
     giocoliere:scale(1.5,1.5)
+    giocoliere:addEventListener("touch",muoviGiocoliere)
+    physics.addBody(giocoliere,"static")
 end
 
 
@@ -305,7 +351,9 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+        lancioLoopTimer = timer.performWithDelay(3000,lanciaPallina,0)
         giocoliere:play()
+        Runtime:addEventListener( "collision", colpito )
 	end
 end
 

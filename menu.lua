@@ -1,11 +1,26 @@
 local composer = require( "composer" )
-
+local widget = require( "widget" )
 local scene = composer.newScene()
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
+
+
+local sheetOptions = {
+    frames = {
+        {   -- pulsante
+            x = 0,
+            y = 0,
+            width = 252,
+            height = 100
+        }
+    }
+}
+
+local oggettiDiScena = graphics.newImageSheet( "images/oggettini.png", sheetOptions )
+
 
 -- initialize local variables
 local backGroup
@@ -31,12 +46,18 @@ local indietroButton
 local toggleIndietroOnOff = 0
 
 
-local function gotoCannone()
-    composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
+local function gotoCannone( event )
+    local phase = event.phase
+    if phase == "ended" then
+        composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
+    end
 end
 
-local function gotoGiocoliere()
-    composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
+local function gotoGiocoliere( event )
+    local phase = event.phase
+    if phase == "ended" then
+        composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
+    end
 end
 
 local function toggleIndietroButton()
@@ -51,19 +72,38 @@ end
 
 local function giochiInScena()
     transition.to( giochiGroup, { time = 1000, transition = easing.inOutElastic,
-                                  x=0 } )
-    gruppoInScena=giochiGroup
+                                  x = 0 } )
+    gruppoInScena = giochiGroup
 end
 
-local function gotoGiochi()
-    transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
-                                      x = -3000,
-                                      onStart = giochiInScena,
-                                      onComplete = toggleIndietroButton() } )
+local function gotoGiochi( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000,
+                                          onStart = giochiInScena,
+                                          onComplete = toggleIndietroButton()
+                                        }
+                      )
+    end
 end
 
-local function gotoImpostazioni()
+local function impostazioniInScena()
+    transition.to( impostazioniGroup, { time = 1000, transition = easing.inOutElastic,
+                                        x = 0 } )
+    gruppoInScena = impostazioniGroup
+end
 
+local function gotoImpostazioni( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000,
+                                          onStart = impostazioniInScena,
+                                          onComplete = toggleIndietroButton()
+                                          }
+                      )
+    end
 end
 
 local function menuPrincipale()
@@ -71,13 +111,16 @@ local function menuPrincipale()
                                       x = 0 } )
 end
 
-local function tornaMenuPrincipale()
-    if ( gruppoInScena ~= principaleGroup ) then
-        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                    x = 3000,
-                                    onStart = menuPrincipale } )
-        gruppoInScena = principaleGroup
-        toggleIndietroButton()
+local function tornaMenuPrincipale( event )
+    local phase = event.phase
+    if phase == "ended" then
+        if ( gruppoInScena ~= principaleGroup ) then
+            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                            x = 3000,
+                                            onStart = menuPrincipale } )
+            gruppoInScena = principaleGroup
+            toggleIndietroButton()
+        end
     end
 end
 
@@ -118,30 +161,74 @@ function scene:create( event )
 
   title = display.newText( backGroup, "Freak Circus", display.contentCenterX, 300, native.systemFont, 200 );
 
-  -- bottoni principaleGroup
-  playButton = display.newText( principaleGroup, "Gioca", display.contentCenterX, 1000, native.systemFont, 100 )
-      playButton:setFillColor( 1, 1, 1 )
+  playButton = widget.newButton {
+      x = display.contentCenterX,
+      y = 1000,
+      width = 380, -- valori di default 630
+      height = 150, -- valori di default 250
+      defaultFile = oggettiDiScena,
+      label = "Gioca",
+      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+      fontSize = 70, -- valori di default 100
+      onEvent = gotoGiochi,
+  }
+  principaleGroup:insert( playButton )
 
-  impostazioniButton = display.newText( principaleGroup, "Impostazioni", display.contentCenterX, 1150, native.systemFont, 100 )
-      playButton:setFillColor( 1, 1, 1 )
+  impostazioniButton = widget.newButton {
+      x = display.contentCenterX,
+      y = 1180,
+      width = 380, -- valori di default 630
+      height = 150, -- valori di default 250
+      defaultFile = oggettiDiScena,
+      label = "Impostazioni",
+      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+      fontSize = 60, -- valori di default 100
+      onEvent = gotoImpostazioni,
+  }
+  principaleGroup:insert( impostazioniButton )
 
-  -- bottoni giochiGroup
-	cannoneButton = display.newText( giochiGroup, "Cannone", display.contentCenterX, 1000, native.systemFont, 100 )
-      cannoneButton:setFillColor( 1, 1, 1 )
+  cannoneButton = widget.newButton {
+      --left = -850,
+      --top = 925,
+      x = display.contentCenterX,
+      y = 1000,
+      width = 380, -- valori di default 630
+      height = 150, -- valori di default 250
+      defaultFile = oggettiDiScena,
+      label = "Cannone",
+      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+      fontSize = 70, -- valori di default 100
+      onEvent = gotoCannone,
+  }
+  giochiGroup:insert( cannoneButton )
 
-  giocoliereButton = display.newText( giochiGroup, "Giocoliere", display.contentCenterX, 1150, native.systemFont, 100 )
-      giocoliereButton:setFillColor( 1, 1, 1 )
+  giocoliereButton = widget.newButton {
+      x = display.contentCenterX,
+      y = 1180,
+      width = 380, -- valori di default 630
+      height = 150, -- valori di default 250
+      defaultFile = oggettiDiScena,
+      label = "Giocoliere",
+      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+      fontSize = 70, -- valori di default 100
+      onEvent = gotoGiocoliere,
+  }
+  giochiGroup:insert( giocoliereButton )
 
-  -- bottone indietro al menu principale
-  indietroButton = display.newText( backGroup, "Indietro", -500, 150, native.systemFont, 100 )
-      indietroButton:setFillColor( 1, 1, 1 )
-      indietroButton.alpha = 0
+  indietroButton = widget.newButton {
+      x = -500,
+      y = 150,
+      width = 380, -- valori di default 630
+      height = 150, -- valori di default 250
+      defaultFile = oggettiDiScena,
+      label = "Indietro",
+      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+      fontSize = 70, -- valori di default 100
+      onEvent = tornaMenuPrincipale,
+  }
+  indietroButton.alpha = 0
+  backGroup:insert( indietroButton )
 
-  playButton:addEventListener( "tap", gotoGiochi )
-  impostazioniButton:addEventListener( "tap", gotoImpostazioni )
-  cannoneButton:addEventListener( "tap", gotoCannone )
-  giocoliereButton:addEventListener( "tap", gotoGiocoliere )
-  indietroButton:addEventListener( "tap", tornaMenuPrincipale )
 end
 
 

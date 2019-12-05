@@ -131,10 +131,18 @@ local punti = 0
 local giocoliere
 local sequenzaGiocoliere = {
     {
-        name = "movimento braccia",
+        name = "movimento a destra",
         start = 1,
+        count = 4,
+        time = 750,
+        loopCount = 0,
+        loopDirection = "forward"
+    },
+    {
+        name = "movimento a sinistra",
+        start = 5,
         count = 8,
-        time = 1500,
+        time = 750,
         loopCount = 0,
         loopDirection = "forward"
     }
@@ -174,14 +182,13 @@ local function precipitaPallina(pallina)
     local maxX = pallina.x+100
 
     if minX<display.contentCenterX-1000 then
-        minX = display.contentCenterX -1000
-    end
+        pallina.x = display.contentCenterX -1000
 
-    if maxX>display.contentCenterX+1000 then
-        maxX = display.contentCenterX +1000
-    end
+    elseif maxX>display.contentCenterX+1000 then
+        pallina.x = display.contentCenterX +1000
 
-    pallina.x = math.random(minX,maxX)
+    else pallina.x = math.random(minX,maxX)
+    end
 
     -- la pallina cade per la gravità
     physics.addBody(pallina,"dynamic",{radius=50})
@@ -192,18 +199,35 @@ local function lanciaPallina()
     local pallina = display.newImageRect(mainGroup,oggettiDiScena2,math.random(1,5),50,50)
     pallina.myName = "pallina"
     table.insert(palline,pallina)
-    pallina.x = giocoliere.x+120
-    pallina.y = display.contentHeight-600
 
+    if(giocoliere.sequence=="movimento a destra") then
+        pallina.x = giocoliere.x+120
+    else
+        pallina.x = giocoliere.x-120
+    end
+    pallina.y = display.contentHeight-600
+    
     transition.to(pallina,{y=-40,time=700}) -- lancia pallina
 
-    timer.performWithDelay(5000,function () precipitaPallina(pallina) end,1)
+    timer.performWithDelay(3000,function () precipitaPallina(pallina) end,1)
 end
 
+
 local function isPallinaPresa(pallina)
-    --TODO
-    return true
+    local presa
+
+    if(pallina.y>display.contentHeight-600 or pallina.y<display.contentHeight-800) then
+        return false
+    end
+
+    if(giocoliere.sequence=="movimento a destra") then
+        presa = pallina.x>giocoliere.x+100 and pallina.x<giocoliere.x+175
+    else
+        presa = pallina.x<giocoliere.x-100 and pallina.x>giocoliere.x-175
+    end
+    return presa
 end
+
 
 local function rimuoviPallina(pallina)
     display.remove(pallina)
@@ -216,13 +240,21 @@ end
 
 local function muoviGiocoliere( event )
  
-    localgiocoliere = event.target
+    local giocoliere = event.target
     local phase = event.phase
  
     if ( "began" == phase ) then
        display.currentStage:setFocus(giocoliere )
        giocoliere.touchOffsetX = event.x -giocoliere.x
+
     elseif ( "moved" == phase ) then
+       if(giocoliere.x < event.x-giocoliere.touchOffsetX) then
+        giocoliere:setSequence("movimento a destra")
+       else
+        giocoliere:setSequence("movimento a sinistra") 
+       end
+
+       giocoliere:play()
        giocoliere.x = event.x -giocoliere.touchOffsetX
  
     elseif ( "ended" == phase or "cancelled" == phase ) then
@@ -363,7 +395,7 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
-        lancioLoopTimer = timer.performWithDelay(3000,lanciaPallina,0)
+        lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
         giocoliere:play()
         lanciaPallina()
         Runtime:addEventListener( "collision", colpito )

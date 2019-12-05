@@ -9,6 +9,7 @@ local scene = composer.newScene()
 local physics = require( "physics" )
 physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
+physics.setGravity(0,19) -- raddoppiata accelerazione caduta palline 
 
 local sheetOptions = {
     frames = {
@@ -169,7 +170,18 @@ end
 -- metodi pallina
 
 local function precipitaPallina(pallina)
-    pallina.x = math.random(display.contentCenterX-1000,display.contentCenterX+1000)
+    local minX = pallina.x-100
+    local maxX = pallina.x+100
+
+    if minX<display.contentCenterX-1000 then
+        minX = display.contentCenterX -1000
+    end
+
+    if maxX>display.contentCenterX+1000 then
+        maxX = display.contentCenterX +1000
+    end
+
+    pallina.x = math.random(minX,maxX)
 
     -- la pallina cade per la gravità
     physics.addBody(pallina,"dynamic",{radius=50})
@@ -180,8 +192,8 @@ local function lanciaPallina()
     local pallina = display.newImageRect(mainGroup,oggettiDiScena2,math.random(1,5),50,50)
     pallina.myName = "pallina"
     table.insert(palline,pallina)
-    pallina.x = giocoliere.x+100
-    pallina.y = display.contentHeight-500
+    pallina.x = giocoliere.x+120
+    pallina.y = display.contentHeight-600
 
     transition.to(pallina,{y=-40,time=700}) -- lancia pallina
 
@@ -330,9 +342,9 @@ function scene:create( event )
 
     giocoliere = display.newSprite( mainGroup,oggettiDiScena, sequenzaGiocoliere )
     giocoliere.x = display.contentCenterX
-    giocoliere.y = display.contentHeight - 420
+    giocoliere.y = display.contentHeight - 520
     giocoliere.myName = "giocoliere"
-    giocoliere:scale(1.5,1.5)
+    giocoliere:scale(2,2)
     giocoliere:addEventListener("touch",muoviGiocoliere)
     physics.addBody(giocoliere,"static")
 end
@@ -353,6 +365,7 @@ function scene:show( event )
         gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
         lancioLoopTimer = timer.performWithDelay(3000,lanciaPallina,0)
         giocoliere:play()
+        lanciaPallina()
         Runtime:addEventListener( "collision", colpito )
 	end
 end

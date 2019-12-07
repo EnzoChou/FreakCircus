@@ -126,7 +126,7 @@ local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOpt
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
 local oggettiDiScena4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
 
-local punti = 0
+local vite = 10
 
 local giocoliere
 local sequenzaGiocoliere = {
@@ -153,13 +153,13 @@ local palline = {}
 local pavimento
 local scimmia
 
-local secondsLeft = 180 -- 3 minuti
-local puntiText
+local seconds = 0
+local lifeText
 local clockText
 
 -- punteggio
 local function aggiornaText()
-    puntiText.text = "Punteggio: " .. punti
+    lifeText.text = "Vite: " .. vite
 end
 
 local function mostraScritta(text,delay)
@@ -293,7 +293,10 @@ local function colpito( event )
             if(obj1.myName=="pallina") then
                 pallina=obj1
             end 
+
             rimuoviPallina(pallina)
+            vite = vite - 1 -- il giocatore perde una vita
+            aggiornaText()
         end
     end
 end
@@ -315,15 +318,16 @@ end
 
 
 local function updateTime()
-    secondsLeft = secondsLeft - 1
-    clockText.text = formatTime(secondsLeft)
+    seconds = seconds + 1
+    clockText.text = formatTime(seconds)
 
-    --se il tempo è scaduto
-    if(secondsLeft==0) then
-        cannone:removeEventListener("tap",lanciaPallina)
+    --se le vite sono terminate
+    if(vite==0) then
+        Runtime:removeEventListener( "collision", colpito )
+        timer.cancel(lancioLoopTimer)
         timer.cancel( gameLoopTimer )
         local endDelay = 2000
-        mostraScritta("Tempo scaduto",endDelay)
+        mostraScritta("Game over",endDelay)
         timer.performWithDelay(endDelay, endGame)
     end
 end
@@ -369,8 +373,8 @@ function scene:create( event )
     scimmia.x=display.contentCenterX-900
     scimmia.y=display.contentHeight-290
 
-    puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
-    clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
+    lifeText = display.newText( uiGroup, "Vite: " .. vite, 900, 90, native.systemFont, 100 )
+    clockText = display.newText( uiGroup, formatTime(seconds), display.contentCenterX, 90, native.systemFont, 100 )
 
     giocoliere = display.newSprite( mainGroup,oggettiDiScena, sequenzaGiocoliere )
     giocoliere.x = display.contentCenterX
@@ -411,6 +415,8 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
+        giocoliere:removeEventListener("touch",muoviGiocoliere)
+        giocoliere:pause()
         physics.pause()
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen

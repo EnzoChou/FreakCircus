@@ -157,7 +157,7 @@ local seconds = 0
 local lifeText
 local clockText
 
--- punteggio
+-- aggiorna vite
 local function aggiornaText()
     lifeText.text = "Vite: " .. vite
 end
@@ -168,50 +168,8 @@ local function mostraScritta(text,delay)
 end
 
 
--- calcola punteggio
-local function valore(  )
-
-end
-
-
 
 -- metodi pallina
-
-local function precipitaPallina(pallina)
-    local minX = pallina.x-100
-    local maxX = pallina.x+100
-
-    if minX<display.contentCenterX-1000 then
-        pallina.x = display.contentCenterX -1000
-
-    elseif maxX>display.contentCenterX+1000 then
-        pallina.x = display.contentCenterX +1000
-
-    else pallina.x = math.random(minX,maxX)
-    end
-
-    -- la pallina cade per la gravità
-    physics.addBody(pallina,"dynamic",{radius=50})
-end
-
-
-local function lanciaPallina()
-    local pallina = display.newImageRect(mainGroup,oggettiDiScena2,math.random(1,5),50,50)
-    pallina.myName = "pallina"
-    table.insert(palline,pallina)
-
-    if(giocoliere.sequence=="movimento a destra") then
-        pallina.x = giocoliere.x+120
-    else
-        pallina.x = giocoliere.x-120
-    end
-    pallina.y = display.contentHeight-600
-    
-    transition.to(pallina,{y=-40,time=700}) -- lancia pallina
-
-    timer.performWithDelay(3000,function () precipitaPallina(pallina) end,1)
-end
-
 
 local function isPallinaPresa(pallina)
     local presa
@@ -233,6 +191,69 @@ local function rimuoviPallina(pallina)
     display.remove(pallina)
     table.remove(pallina)
 end
+
+
+local function onCollision( pallina,event )
+
+    if ( event.phase == "began" ) then
+
+        local pallina = event.target
+        local obj2 = event.other
+
+        if ( obj2.myName == "giocoliere")
+        then
+            if(isPallinaPresa(pallina)) then
+                rimuoviPallina(pallina)
+            end
+        end
+
+        if ( obj2.myName == "pavimento")
+        then
+            pallina.collision = nil
+            vite = vite - 1 -- il giocatore perde una vita
+            aggiornaText()
+        end
+    end
+end
+
+
+local function precipitaPallina(pallina)
+    local minX = pallina.x-100
+    local maxX = pallina.x+100
+
+    if minX<display.contentCenterX-1000 then
+        pallina.x = display.contentCenterX -1000
+
+    elseif maxX>display.contentCenterX+1000 then
+        pallina.x = display.contentCenterX +1000
+
+    else pallina.x = math.random(minX,maxX)
+    end
+
+    -- la pallina cade per la gravità
+    physics.addBody(pallina,"dynamic",{radius=30})
+end
+
+
+local function lanciaPallina()
+    local pallina = display.newImageRect(mainGroup,oggettiDiScena2,math.random(1,5),50,50)
+    pallina.myName = "pallina"
+    pallina.collision = onCollision
+    pallina:addEventListener("collision")
+    table.insert(palline,pallina)
+
+    if(giocoliere.sequence=="movimento a destra") then
+        pallina.x = giocoliere.x+120
+    else
+        pallina.x = giocoliere.x-120
+    end
+    pallina.y = display.contentHeight-600
+    
+    transition.to(pallina,{y=-40,time=700}) -- lancia pallina
+
+    timer.performWithDelay(3000,function () precipitaPallina(pallina) end,1)
+end
+
 
 
 
@@ -266,45 +287,6 @@ end
 
 
 
-local function colpito( event )
-
-    if ( event.phase == "began" ) then
-
-        local obj1 = event.object1
-        local obj2 = event.object2
-
-        if ( ( obj1.myName == "giocoliere" and obj2.myName == "pallina" ) or
-            ( obj1.myName == "pallina" and obj2.myName == "giocoliere" ) )
-        then
-            local pallina = obj2
-            if(obj1.myName=="pallina") then
-                pallina=obj1
-            end
-
-            if(isPallinaPresa(pallina)) then
-                rimuoviPallina(pallina)
-            end
-        end
-
-        if ( ( obj1.myName == "pavimento" and obj2.myName == "pallina" ) or
-        ( obj1.myName == "pallina" and obj2.myName == "pavimento" ) )
-        then
-            local pallina = obj2
-            if(obj1.myName=="pallina") then
-                pallina=obj1
-            end 
-
-            rimuoviPallina(pallina)
-            vite = vite - 1 -- il giocatore perde una vita
-            aggiornaText()
-        end
-    end
-end
-
-
-
-
-
 local function formatTime(seconds)
     local minutes = math.floor( seconds / 60 )
     local seconds = seconds % 60
@@ -323,9 +305,15 @@ local function updateTime()
 
     --se le vite sono terminate
     if(vite==0) then
-        Runtime:removeEventListener( "collision", colpito )
+        -- rimuovo i loop
         timer.cancel(lancioLoopTimer)
         timer.cancel( gameLoopTimer )
+
+        -- rimuovi tutti i listener per le collisioni
+        for i = #palline, 1, -1 do
+            palline[i].collision = nil
+        end
+
         local endDelay = 2000
         mostraScritta("Game over",endDelay)
         timer.performWithDelay(endDelay, endGame)
@@ -402,7 +390,6 @@ function scene:show( event )
         lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
         giocoliere:play()
         lanciaPallina()
-        Runtime:addEventListener( "collision", colpito )
 	end
 end
 

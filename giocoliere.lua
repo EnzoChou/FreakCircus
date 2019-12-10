@@ -157,6 +157,10 @@ local seconds = 0
 local lifeText
 local clockText
 
+local function endGame()
+    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+end
+
 -- aggiorna vite
 local function aggiornaText()
     lifeText.text = "Vite: " .. vite
@@ -212,6 +216,24 @@ local function onCollision( pallina,event )
             pallina.collision = nil
             vite = vite - 1 -- il giocatore perde una vita
             aggiornaText()
+
+            --se le vite sono terminate
+            if(vite==0) 
+            then
+                --rimuovo i loop    
+                timer.cancel(lancioLoopTimer)
+                timer.cancel( gameLoopTimer )
+
+                -- rimuovi tutti i listener per le collisioni
+                for i = #palline, 1, -1 do
+                   palline[i].collision = nil
+                end
+
+                local endDelay = 2000
+                mostraScritta("Game over",endDelay)
+                timer.performWithDelay(endDelay, endGame)
+            end
+            
         end
     end
 end
@@ -294,30 +316,9 @@ local function formatTime(seconds)
 end
 
 
-local function endGame()
-    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
-end
-
-
 local function updateTime()
     seconds = seconds + 1
     clockText.text = formatTime(seconds)
-
-    --se le vite sono terminate
-    if(vite==0) then
-        -- rimuovo i loop
-        timer.cancel(lancioLoopTimer)
-        timer.cancel( gameLoopTimer )
-
-        -- rimuovi tutti i listener per le collisioni
-        for i = #palline, 1, -1 do
-            palline[i].collision = nil
-        end
-
-        local endDelay = 2000
-        mostraScritta("Game over",endDelay)
-        timer.performWithDelay(endDelay, endGame)
-    end
 end
 
 

@@ -11,6 +11,11 @@ physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
 physics.setGravity(0,19) -- raddoppiata accelerazione caduta palline 
 
+--timer
+local gameLoopTimer
+local lancioLoopTimer
+local lancioTimer
+
 local sheetOptions = {
     frames = {
         {   -- 1) giocoliere1 verso destra
@@ -156,9 +161,14 @@ local scimmia
 local seconds = 0
 local lifeText
 local clockText
+local pauseText
 
 local function endGame()
     composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+end
+
+local function pausa()
+    composer.gotoScene("pausa",{time=10})
 end
 
 -- aggiorna vite
@@ -220,6 +230,8 @@ local function onCollision( pallina,event )
             --se le vite sono terminate
             if(vite==0) 
             then
+                pauseText:removeEventListener("tap",pausa)
+
                 --rimuovo i loop    
                 timer.cancel(lancioLoopTimer)
                 timer.cancel( gameLoopTimer )
@@ -233,7 +245,7 @@ local function onCollision( pallina,event )
                 mostraScritta("Game over",endDelay)
                 timer.performWithDelay(endDelay, endGame)
             end
-            
+
         end
     end
 end
@@ -273,7 +285,7 @@ local function lanciaPallina()
     
     transition.to(pallina,{y=-40,time=700}) -- lancia pallina
 
-    timer.performWithDelay(3000,function () precipitaPallina(pallina) end,1)
+    lancioTimer = timer.performWithDelay(2000,function () precipitaPallina(pallina) end,1)
 end
 
 
@@ -338,6 +350,12 @@ function scene:create( event )
 
     physics.pause()
 
+    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+    lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
+
+    timer.pause(gameLoopTimer)
+    timer.pause(lancioLoopTimer)
+
     -- Set up display groups
     backGroup = display.newGroup()
     sceneGroup:insert( backGroup )
@@ -364,6 +382,9 @@ function scene:create( event )
 
     lifeText = display.newText( uiGroup, "Vite: " .. vite, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(seconds), display.contentCenterX, 90, native.systemFont, 100 )
+    pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
+
+    pauseText:addEventListener("tap",pausa)
 
     giocoliere = display.newSprite( mainGroup,oggettiDiScena, sequenzaGiocoliere )
     giocoliere.x = display.contentCenterX
@@ -387,10 +408,16 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         physics.start()
-        gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
-        lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
         giocoliere:play()
-        lanciaPallina()
+        timer.resume(gameLoopTimer)
+        timer.resume(lancioLoopTimer)
+        
+        if(seconds==0) then
+            --primo lancio
+            lanciaPallina()
+        else
+            timer.resume(lancioTimer)
+        end
 	end
 end
 
@@ -403,12 +430,23 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        giocoliere:removeEventListener("touch",muoviGiocoliere)
+
+        -- se il gioco non è ancora finito metti in pausa i timer
+        if(vite~=0) then
+            timer.pause(gameLoopTimer)
+            timer.pause(lancioLoopTimer)
+            timer.pause(lancioTimer)
+        end
+
         giocoliere:pause()
         physics.pause()
+
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-		composer.removeScene( "giocoliere" )
+
+        if(vite==0) then
+            composer.removeScene("giocoliere")
+        end
 	end
 end
 

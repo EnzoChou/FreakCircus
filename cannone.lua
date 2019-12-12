@@ -229,7 +229,7 @@ local function valore( valoreYcolpito, valoreYBersaglio )
     elseif ( accuracy<3.5 )
         then risultato = 60
     else
-        risultato = 0
+        risultato = 5
     end
     return risultato
 end
@@ -249,19 +249,20 @@ local function colpito( event )
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
-            mostraScritta("COLPITO",1000)
-            transition.pause()
             local risultato = valore( obj2.y, obj1.y )
+            mostraScritta("+"..risultato,1000)
+            transition.pause()
 
-            if risultato~=0
+            if (risultato>5)
             then
                 display.remove(bucoBersaglio) --se il buco gia' esiste lo rimuovo
                 bucoBersaglio = display.newImageRect( mainGroup, oggettiDiScena2, 2, 32, 42 )
                 bucoBersaglio.x = event.x
                 bucoBersaglio.y = event.y
-                punti = punti + risultato
-                puntiText.text = "Punteggio: " .. punti
             end
+
+            punti = punti + risultato
+            aggiornaText()
 
             timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
@@ -378,7 +379,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
-        Runtime:removeEventListener( "collision", onCollision )
+        Runtime:removeEventListener( "collision", colpito )
         transition.pause()
         physics.pause()
 	elseif ( phase == "did" ) then

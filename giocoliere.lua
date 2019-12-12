@@ -168,7 +168,7 @@ local function endGame()
 end
 
 local function pausa()
-    composer.gotoScene("pausa",{time=10})
+    composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere"} })
 end
 
 -- aggiorna vite

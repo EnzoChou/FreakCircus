@@ -10,6 +10,8 @@ local physics = require( "physics" )
 physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
 
+local gameLoopTimer
+
 local sheetOptions = {
     frames = {
         {   -- 1) cannone
@@ -89,9 +91,11 @@ local pavimento
 local scimmia
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local secondsLeft = 180 -- 3 minuti
+local totalTime = 10 -- 3 minuti
+local secondsLeft = totalTime
 local puntiText
 local clockText
+local pauseText
 
 local impulso= 550;
 
@@ -183,6 +187,9 @@ local function formatTime(seconds)
     return string.format( "%02d:%02d", minutes, seconds )
 end
 
+local function pausa()
+    composer.gotoScene("pausa",{time=10,params = {scene = "cannone"} })
+end
 
 local function endGame()
     composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
@@ -195,6 +202,7 @@ local function updateTime()
 
     --se il tempo è scaduto
     if(secondsLeft==0) then
+        pauseText:removeEventListener("tap",pausa)
         cannone:removeEventListener("tap",sparaPallaDiCannone)
         timer.cancel( gameLoopTimer )
         local endDelay = 2000
@@ -290,6 +298,9 @@ function scene:create( event )
 
     physics.pause()
 
+    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+    timer.pause(gameLoopTimer)
+
     -- Set up display groups
     backGroup = display.newGroup()
     sceneGroup:insert( backGroup )
@@ -347,6 +358,9 @@ function scene:create( event )
 
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
+    pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
+
+    pauseText:addEventListener("tap",pausa)
 
 end
 
@@ -363,9 +377,14 @@ function scene:show( event )
 	elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         physics.start()
-        ruotaCannone()
-        muoviBersaglio()
-        gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+
+        -- all'inizio del gioco
+        if(secondsLeft==totalTime) then
+            ruotaCannone()
+            muoviBersaglio()
+        end
+
+        timer.resume(gameLoopTimer)
         Runtime:addEventListener( "collision", colpito )
 	end
 end
@@ -380,11 +399,19 @@ function scene:hide( event )
 	if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
         Runtime:removeEventListener( "collision", colpito )
+
+        -- se il gioco non è finito metti in pausa il timer
+        if(secondsLeft~=0) then
+            timer.pause(gameLoopTimer)
+        end
+
         transition.pause()
         physics.pause()
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-		composer.removeScene( "cannone" )
+        if(secondsLeft==0) then
+            composer.removeScene( "cannone" )
+        end
 	end
 end
 

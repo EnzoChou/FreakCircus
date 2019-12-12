@@ -1,18 +1,19 @@
 local composer = require( "composer" )
 
 local scene = composer.newScene()
+local backScene
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local function resume()
-    composer.gotoScene( "giocoliere" , { time=10 } )
+    composer.gotoScene( backScene , { time=10 } )
 end
  
 local function goToMenu()
     composer.gotoScene( "menu" , { time=10 } )
-    composer.removeScene("giocoliere")
+    composer.removeScene(backScene)
 end
 
 -- -----------------------------------------------------------------------------------
@@ -21,6 +22,8 @@ end
 
 -- create()
 function scene:create( event )
+
+	backScene = event.params.scene
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen

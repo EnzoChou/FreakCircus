@@ -2,6 +2,10 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local score = require("score")
+
+local punteggiFilePath = system.pathForFile( "punteggicannone" ..".json", system.DocumentsDirectory )
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -91,7 +95,7 @@ local pavimento
 local scimmia
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local totalTime = 10 -- 3 minuti
+local totalTime = 180 -- 3 minuti
 local secondsLeft = totalTime
 local puntiText
 local clockText
@@ -187,11 +191,16 @@ local function formatTime(seconds)
     return string.format( "%02d:%02d", minutes, seconds )
 end
 
+local function goToPunteggi()
+    composer.gotoScene("punteggi",{time=10,params = {scene = "cannone"} })
+end
+
 local function pausa()
     composer.gotoScene("pausa",{time=10,params = {scene = "cannone"} })
 end
 
 local function endGame()
+    score.salva(punteggiFilePath,punti)
     composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
 end
 
@@ -359,8 +368,10 @@ function scene:create( event )
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
     pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
+    local punteggiText = display.newText(uiGroup,"Punteggi",display.contentCenterX-500,90,native.systemFont,100)
 
     pauseText:addEventListener("tap",pausa)
+    punteggiText:addEventListener("tap",goToPunteggi)
 
 end
 

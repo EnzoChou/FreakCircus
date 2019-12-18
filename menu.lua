@@ -1,6 +1,10 @@
 local composer = require( "composer" )
 local widget = require( "widget" )
 local scene = composer.newScene()
+-- Reserve channel 1 for background music
+audio.reserveChannels( 1 )
+-- Reduce the overall volume of the channel
+audio.setVolume( 0.5, { channel = 1 } )
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
@@ -44,6 +48,10 @@ local giocoliereButton
 -- bottone indietro
 local indietroButton
 local toggleIndietroOnOff = 0
+
+-- audio
+local musicTrack
+local bottone
 
 
 local function gotoCannone( event )
@@ -229,6 +237,10 @@ function scene:create( event )
   indietroButton.alpha = 0
   backGroup:insert( indietroButton )
 
+  -- zona audio
+  musicTrack = audio.loadStream( "audio/Circus.mp3" )
+
+
 end
 
 
@@ -243,6 +255,9 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
+    -- parte la musica
+    audio.rewind( musicTrack )
+    audio.play( musicTrack, { channel=1, loops=-1 } )
 
 	end
 end
@@ -259,7 +274,8 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+    -- ferma la musica
+    audio.stop( 1 )
 	end
 end
 
@@ -269,6 +285,8 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
+  -- Dispose audio
+  audio.dispose( musicTrack )
 
 end
 

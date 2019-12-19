@@ -51,12 +51,13 @@ local toggleIndietroOnOff = 0
 
 -- audio
 local musicTrack
-local bottone
+local bottoneMusic
 
 
 local function gotoCannone( event )
     local phase = event.phase
     if phase == "ended" then
+        audio.play( bottoneMusic )
         composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
     end
 end
@@ -64,6 +65,7 @@ end
 local function gotoGiocoliere( event )
     local phase = event.phase
     if phase == "ended" then
+        audio.play( bottoneMusic )
         composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
     end
 end
@@ -93,6 +95,7 @@ local function gotoGiochi( event )
                                           onComplete = toggleIndietroButton()
                                         }
                       )
+        audio.play( bottoneMusic )
     end
 end
 
@@ -110,7 +113,8 @@ local function gotoImpostazioni( event )
                                           onStart = impostazioniInScena,
                                           onComplete = toggleIndietroButton()
                                           }
-                      )
+                     )
+        audio.play( bottoneMusic )
     end
 end
 
@@ -127,6 +131,7 @@ local function tornaMenuPrincipale( event )
                                             x = 3000,
                                             onStart = menuPrincipale } )
             gruppoInScena = principaleGroup
+            audio.play( bottoneMusic )
             toggleIndietroButton()
         end
     end
@@ -239,6 +244,7 @@ function scene:create( event )
 
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )
+  bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
 
 
 end
@@ -287,6 +293,7 @@ function scene:destroy( event )
 	-- Code here runs prior to the removal of scene's view
   -- Dispose audio
   audio.dispose( musicTrack )
+  audio.dispose( bottoneMusic )
 
 end
 

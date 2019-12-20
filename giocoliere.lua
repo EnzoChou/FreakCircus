@@ -2,6 +2,10 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local score = require("score")
+
+local punteggiFilePath = system.pathForFile( "punteggigiocoliere.json", system.DocumentsDirectory )
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -164,6 +168,7 @@ local clockText
 local pauseText
 
 local function endGame()
+    score.salva(punteggiFilePath,seconds)
     composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
 end
 

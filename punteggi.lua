@@ -1,7 +1,7 @@
 local composer = require( "composer" )
 
 local scene = composer.newScene()
-local backScene
+local game
 
 local score = require("score")
 
@@ -13,8 +13,21 @@ local filePath
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local function resume()
-    composer.gotoScene( backScene , { time=10 } )
+local function goToMenu()
+    composer.gotoScene( "menu" , { time=10 } )
+end
+
+local function formatTime(seconds)
+    local minutes = math.floor( seconds / 60 )
+    local seconds = seconds % 60
+    return string.format( "%02d:%02d", minutes, seconds )
+end
+
+local function formattaPunteggio(p)
+	if(game=="giocoliere") then
+		return formatTime(p)
+	end
+	return p
 end
 
 -- -----------------------------------------------------------------------------------
@@ -24,10 +37,10 @@ end
 -- create()
 function scene:create( event )
 
-    backScene = event.params.scene
-    filePath = system.pathForFile( "punteggi".. backScene ..".json", system.DocumentsDirectory )
+    game = event.params.game
+    filePath = system.pathForFile( "punteggi".. game ..".json", system.DocumentsDirectory )
 
-    punteggi = score.carica(filePath)
+	punteggi = score.carica(filePath)
 
 	local sceneGroup = self.view
 	local background = display.newImageRect( sceneGroup, "images/sfondo2.png", 3000, 1280)
@@ -39,15 +52,16 @@ function scene:create( event )
             local yPos = 0 + ( i * 120 )
 
             local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 80 )
-            rank.anchorX = 1
- 
+			rank.anchorX = 1
+			
+			punteggi[i] = formattaPunteggio(punteggi[i])
             local punteggio = display.newText( sceneGroup, punteggi[i], display.contentCenterX-30, yPos, native.systemFont, 80 )
             punteggio.anchorX = 0
         end
     end
 	
-	local resumeButton = display.newText( sceneGroup, "Riprendi", display.contentCenterX-900, 60, native.systemFont, 100 )
-	resumeButton:addEventListener( "tap", resume )
+	local goToMenuButton = display.newText( sceneGroup, "Indietro", display.contentCenterX-900, 60, native.systemFont, 100 )
+	goToMenuButton:addEventListener( "tap", goToMenu )
 end
 
 

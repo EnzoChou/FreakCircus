@@ -40,10 +40,15 @@ local title
 -- bottoni principaleGroup
 local playButton
 local impostazioniButton
+local punteggiButton
 
 -- bottoni giochiGroup
 local cannoneButton
 local giocoliereButton
+
+-- bottoni punteggiGroup
+local punteggiCannoneButton
+local punteggiGiocoliereButton
 
 -- bottone indietro
 local indietroButton
@@ -69,6 +74,23 @@ local function gotoGiocoliere( event )
         composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
     end
 end
+
+local function goToPunteggiCannone( event )
+    local phase = event.phase
+    if phase == "ended" then
+        audio.play( bottoneMusic )
+        composer.gotoScene( "punteggi" , { time=10, params = {game = "cannone"} } )
+    end
+end
+
+local function goToPunteggiGiocoliere( event )
+    local phase = event.phase
+    if phase == "ended" then
+        audio.play( bottoneMusic )
+        composer.gotoScene( "punteggi" , { time=10, params = {game = "giocoliere"} } )
+    end
+end
+
 
 local function toggleIndietroButton()
     if ( toggleIndietroOnOff == 0 ) then
@@ -117,6 +139,28 @@ local function gotoImpostazioni( event )
         audio.play( bottoneMusic )
     end
 end
+
+local function punteggiInScena()
+    transition.to( punteggiGroup, { time = 1000, transition = easing.inOutElastic,
+                                  x = 0 } )
+    gruppoInScena = punteggiGroup
+end
+
+local function gotoPunteggi( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000,
+                                          onStart = punteggiInScena,
+                                          onComplete = toggleIndietroButton()
+                                          }
+                     )
+        audio.play( bottoneMusic )
+    end
+end
+
+
+
 
 local function menuPrincipale()
     transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
@@ -188,8 +232,8 @@ function scene:create( event )
   principaleGroup:insert( playButton )
 
   impostazioniButton = widget.newButton {
-      x = display.contentCenterX,
-      y = 1180,
+      x = -500,
+      y = 150,
       width = 380, -- valori di default 630
       height = 150, -- valori di default 250
       defaultFile = oggettiDiScena,
@@ -198,7 +242,21 @@ function scene:create( event )
       fontSize = 60, -- valori di default 100
       onEvent = gotoImpostazioni,
   }
-  principaleGroup:insert( impostazioniButton )
+  backGroup:insert( impostazioniButton )
+
+  
+  punteggiButton = widget.newButton {
+    x = display.contentCenterX,
+    y = 1180,
+    width = 380, -- valori di default 630
+    height = 150, -- valori di default 250
+    defaultFile = oggettiDiScena,
+    label = "Punteggi",
+    labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+    fontSize = 60, -- valori di default 100
+    onEvent = gotoPunteggi,
+}
+principaleGroup:insert( punteggiButton )
 
   cannoneButton = widget.newButton {
       --left = -850,
@@ -227,6 +285,34 @@ function scene:create( event )
       onEvent = gotoGiocoliere,
   }
   giochiGroup:insert( giocoliereButton )
+
+
+  punteggiCannoneButton = widget.newButton {
+    x = display.contentCenterX,
+    y = 1000,
+    width = 380, -- valori di default 630
+    height = 150, -- valori di default 250
+    defaultFile = oggettiDiScena,
+    label = "Cannone",
+    labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+    fontSize = 70, -- valori di default 100
+    onEvent = goToPunteggiCannone,
+}
+punteggiGroup:insert( punteggiCannoneButton )
+
+punteggiGiocoliereButton = widget.newButton {
+    x = display.contentCenterX,
+    y = 1180,
+    width = 380, -- valori di default 630
+    height = 150, -- valori di default 250
+    defaultFile = oggettiDiScena,
+    label = "Giocoliere",
+    labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+    fontSize = 70, -- valori di default 100
+    onEvent = goToPunteggiGiocoliere,
+}
+punteggiGroup:insert( punteggiGiocoliereButton )
+
 
   indietroButton = widget.newButton {
       x = -500,

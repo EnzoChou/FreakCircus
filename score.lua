@@ -22,14 +22,11 @@ end
 
 local function salva(filePath,punteggio)
     local file = io.open( filePath, "r" )
+    local punteggi = {}
 
     if file then
         local contents = file:read( "*a" )
         punteggi = json.decode( contents )
-
-        if(punteggi==nil) then
-            punteggi = {}
-        end
 
         table.insert( punteggi, punteggio)
        
@@ -43,12 +40,15 @@ local function salva(filePath,punteggio)
         table.remove(punteggi,11)
 
         io.close( file )
-
-        --sovrascrivi il file
-        file = io.open( filePath, "w" )
-        file:write( json.encode( punteggi ) )
-        io.close( file )
+    else 
+        table.insert( punteggi, punteggio)
     end
+
+    
+    --sovrascrivi il file (o crealo se non esiste)
+    file = io.open( filePath, "w" )
+    file:write( json.encode( punteggi ) )
+    io.close( file )
 end
 
 score.carica = carica

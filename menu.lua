@@ -23,7 +23,19 @@ local sheetOptions = {
     }
 }
 
+local sheetOptions2 = {
+    frames = {
+        { -- icona opzioni, credits --> "Icon made by Freepik from www.flaticon.com"
+            x = 0,
+            y = 0,
+            width = 512,
+            height = 512
+        }
+    }
+}
+
 local oggettiDiScena = graphics.newImageSheet( "images/oggettini.png", sheetOptions )
+local oggettiDiScena2 = graphics.newImageSheet( "images/settings 512px.png", sheetOptions2 )
 
 
 -- initialize local variables
@@ -32,7 +44,7 @@ local impostazioniGroup
 local punteggiGroup
 local giochiGroup
 local principaleGroup
-local gruppoInScena
+local gruppoInScena = principaleGroup
 
 local background
 local title
@@ -53,6 +65,10 @@ local punteggiGiocoliereButton
 -- bottone indietro
 local indietroButton
 local toggleIndietroOnOff = 0
+
+-- bottone impostazioni
+local impostazioniButton
+local toggleImpostazioniOnOff = 1
 
 -- audio
 local musicTrack
@@ -102,6 +118,16 @@ local function toggleIndietroButton()
     end
 end
 
+local function toggleImpostazioniButton()
+    if ( toggleImpostazioniOnOff == 0 ) then
+        transition.to( impostazioniButton, { time = 1000, effect = "fadeIn", alpha = 1 } )
+        toggleImpostazioniOnOff = 1
+    else
+        transition.to( impostazioniButton, { time = 1000, effect = "fadeOut", alpha = 0 } )
+        toggleImpostazioniOnOff = 0
+    end
+end
+
 local function giochiInScena()
     transition.to( giochiGroup, { time = 1000, transition = easing.inOutElastic,
                                   x = 0 } )
@@ -111,7 +137,7 @@ end
 local function gotoGiochi( event )
     local phase = event.phase
     if phase == "ended" then
-        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
                                           onStart = giochiInScena,
                                           onComplete = toggleIndietroButton()
@@ -129,8 +155,11 @@ end
 
 local function gotoImpostazioni( event )
     local phase = event.phase
-    if phase == "ended" then
-        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+    if phase == "began" then
+        impostazioniButton:rotate( 30 )
+    elseif phase == "ended" then
+        impostazioniButton:rotate( -30 )
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
                                           onStart = impostazioniInScena,
                                           onComplete = toggleIndietroButton()
@@ -149,7 +178,7 @@ end
 local function gotoPunteggi( event )
     local phase = event.phase
     if phase == "ended" then
-        transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
                                           onStart = punteggiInScena,
                                           onComplete = toggleIndietroButton()
@@ -231,20 +260,6 @@ function scene:create( event )
   }
   principaleGroup:insert( playButton )
 
-  impostazioniButton = widget.newButton {
-      x = -500,
-      y = 150,
-      width = 380, -- valori di default 630
-      height = 150, -- valori di default 250
-      defaultFile = oggettiDiScena,
-      label = "Impostazioni",
-      labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
-      fontSize = 60, -- valori di default 100
-      onEvent = gotoImpostazioni,
-  }
-  backGroup:insert( impostazioniButton )
-
-  
   punteggiButton = widget.newButton {
     x = display.contentCenterX,
     y = 1180,
@@ -327,6 +342,16 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   }
   indietroButton.alpha = 0
   backGroup:insert( indietroButton )
+
+  impostazioniButton = widget.newButton {
+    x = 1300,
+    y = 150,
+    width = 150,
+    height = 150,
+    defaultFile = oggettiDiScena2,
+    onEvent = gotoImpostazioni,
+}
+  backGroup:insert( impostazioniButton )
 
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )

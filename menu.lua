@@ -14,11 +14,17 @@ audio.setVolume( 0.5, { channel = 1 } )
 
 local sheetOptions = {
     frames = {
-        {   -- pulsante
+        {   -- pulsante/biglietto
             x = 0,
             y = 0,
             width = 252,
             height = 100
+        },
+        {   -- pallina
+            x = 0,
+            y = 100,
+            width = 30,
+            height = 30
         }
     }
 }
@@ -34,8 +40,20 @@ local sheetOptions2 = {
     }
 }
 
+local sheetOptions3 = {
+    frames = {
+        { -- barra audio --> "Icon made by "Apache 2.0" from https://icon-icons.com/icon/minus/111123"
+            x = 56,
+            y = 246,
+            width = 400,
+            height = 20
+        }
+    }
+}
+
 local oggettiDiScena = graphics.newImageSheet( "images/oggettini.png", sheetOptions )
 local oggettiDiScena2 = graphics.newImageSheet( "images/settings 512px.png", sheetOptions2 )
+local oggettiDiScena3 = graphics.newImageSheet( "images/minus_111123.png", sheetOptions3 )
 
 
 -- initialize local variables
@@ -69,6 +87,8 @@ local toggleIndietroOnOff = 0
 -- bottone impostazioni
 local impostazioniButton
 local toggleImpostazioniOnOff = 1
+local soundtrackAudioBar
+local pulsanteAudio
 
 -- audio
 local musicTrack
@@ -137,7 +157,6 @@ end
 local function gotoGiochi( event )
     local phase = event.phase
     if phase == "ended" then
-    -- print( "WARNING: " .. tostring( principaleGroup ) .. " " .. tostring( gruppoInScena ) )
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
                                           onStart = giochiInScena
@@ -155,19 +174,44 @@ local function impostazioniInScena()
 end
 
 local function gotoImpostazioni( event )
-    local phase = event.phase
-    if phase == "began" then
-        impostazioniButton:rotate( 30 )
-    elseif phase == "ended" then
-        impostazioniButton:rotate( -30 )
-        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                          x = -3000,
-                                          onStart = impostazioniInScena
-                                          }
-                     )
-        audio.play( bottoneMusic )
-        toggleIndietroButton()
+    if gruppoInScena ~= impostazioniGroup then
+        local phase = event.phase
+        if phase == "began" then
+            impostazioniButton:rotate( 30 )
+        elseif phase == "ended" then
+            impostazioniButton:rotate( -30 )
+            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                              x = -3000,
+                                              onStart = impostazioniInScena
+                                              }
+                         )
+            audio.play( bottoneMusic )
+            toggleIndietroButton()
+        end
     end
+end
+
+local function dragAudio( event )
+
+    local pallina = event.target
+    local phase = event.phase
+
+    if ( "began" == phase ) then
+        -- Set touch focus on the pallina
+        display.currentStage:setFocus( pallina )
+        -- Store initial offset position
+        pallina.touchOffsetX = event.x - pallina.x
+
+    elseif ( "moved" == phase ) then
+        -- Move the pallina to the new touch position
+        pallina.x = event.x - pallina.touchOffsetX
+
+    elseif ( "ended" == phase or "cancelled" == phase ) then
+        -- Release touch focus on the pallina
+        display.currentStage:setFocus( nil )
+    end
+
+    return true  -- Prevents touch propagation to underlying objects
 end
 
 local function punteggiInScena()
@@ -346,20 +390,36 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   backGroup:insert( indietroButton )
 
   impostazioniButton = widget.newButton {
-    x = 1300,
-    y = 150,
-    width = 150,
-    height = 150,
-    defaultFile = oggettiDiScena2,
-    onEvent = gotoImpostazioni,
-}
+      x = 1300,
+      y = 150,
+      width = 150,
+      height = 150,
+      defaultFile = oggettiDiScena2,
+      onEvent = gotoImpostazioni,
+  }
   backGroup:insert( impostazioniButton )
+
+  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 150 )
+  bigliettoAudio.x = display.contentCenterX
+  bigliettoAudio.y = display.contentCenterY+300
+
+  soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
+  soundtrackAudioBar.x = display.contentCenterX
+  soundtrackAudioBar.y = display.contentCenterY+300
+  soundtrackAudioBar.myName = "audioBar"
+
+  pulsanteAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
+  pulsanteAudio.x = display.contentCenterX
+  pulsanteAudio.y = display.contentCenterY+300
+  physics.addBody( pulsanteAudio, { radius=40, isSensor=true } )
+  pulsanteAudio.myName = "pulsanteAudio"
+
 
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )
   bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
 
-
+  pulsanteAudio:addEventListener( "touch", dragAudio )
 end
 
 

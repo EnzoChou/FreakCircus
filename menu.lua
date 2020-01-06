@@ -44,7 +44,7 @@ local impostazioniGroup
 local punteggiGroup
 local giochiGroup
 local principaleGroup
-local gruppoInScena = principaleGroup
+local gruppoInScena
 
 local background
 local title
@@ -109,7 +109,7 @@ end
 
 
 local function toggleIndietroButton()
-    if ( toggleIndietroOnOff == 0 ) then
+    if ( gruppoInScena ~= principaleGroup ) then
         transition.to( indietroButton, { time = 1000, effect = "fadeIn", alpha = 1 } )
         toggleIndietroOnOff = 1
     else
@@ -137,12 +137,13 @@ end
 local function gotoGiochi( event )
     local phase = event.phase
     if phase == "ended" then
+    -- print( "WARNING: " .. tostring( principaleGroup ) .. " " .. tostring( gruppoInScena ) )
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
-                                          onStart = giochiInScena,
-                                          onComplete = toggleIndietroButton()
+                                          onStart = giochiInScena
                                         }
                       )
+        toggleIndietroButton()
         audio.play( bottoneMusic )
     end
 end
@@ -161,11 +162,11 @@ local function gotoImpostazioni( event )
         impostazioniButton:rotate( -30 )
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
-                                          onStart = impostazioniInScena,
-                                          onComplete = toggleIndietroButton()
+                                          onStart = impostazioniInScena
                                           }
                      )
         audio.play( bottoneMusic )
+        toggleIndietroButton()
     end
 end
 
@@ -180,11 +181,11 @@ local function gotoPunteggi( event )
     if phase == "ended" then
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
-                                          onStart = punteggiInScena,
-                                          onComplete = toggleIndietroButton()
+                                          onStart = punteggiInScena
                                           }
                      )
         audio.play( bottoneMusic )
+        toggleIndietroButton()
     end
 end
 
@@ -194,6 +195,7 @@ end
 local function menuPrincipale()
     transition.to( principaleGroup, { time = 1000, transition = easing.inOutElastic,
                                       x = 0 } )
+    gruppoInScena = principaleGroup
 end
 
 local function tornaMenuPrincipale( event )
@@ -203,7 +205,6 @@ local function tornaMenuPrincipale( event )
             transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                             x = 3000,
                                             onStart = menuPrincipale } )
-            gruppoInScena = principaleGroup
             audio.play( bottoneMusic )
             toggleIndietroButton()
         end
@@ -240,6 +241,7 @@ function scene:create( event )
 
   principaleGroup = display.newGroup()
   sceneGroup:insert( principaleGroup )
+  gruppoInScena = principaleGroup
 
 	background = display.newImageRect( backGroup, "images/sfondo1.png", 3000, 1280 )
   background.x = display.contentCenterX

@@ -169,7 +169,7 @@ local pauseText
 
 local function endGame()
     score.salva(punteggiFilePath,seconds)
-    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+    composer.gotoScene( "pausa", { time=2000,params = {scene = "giocoliere",punteggio = seconds} } )
 end
 
 local function pausa()

@@ -198,7 +198,7 @@ end
 
 local function endGame()
     score.salva(punteggiFilePath,punti)
-    composer.gotoScene( "menu", { time=2000, effect="crossFade" } )
+    composer.gotoScene( "pausa", { time=2000,params = {scene = "cannone",punteggio = punti} } )
 end
 
 

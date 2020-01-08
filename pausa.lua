@@ -13,7 +13,20 @@ end
  
 local function goToMenu()
     composer.gotoScene( "menu" , { time=10 } )
-    composer.removeScene(backScene)
+    composer.removeScene(backScene) --rimuove la scena se esiste
+end
+
+local function formatTime(seconds)
+    local minutes = math.floor( seconds / 60 )
+    local seconds = seconds % 60
+    return string.format( "%02d:%02d", minutes, seconds )
+end
+
+local function formattaPunteggio(p)
+	if(backScene=="giocoliere") then
+		return formatTime(p)
+	end
+	return p
 end
 
 -- -----------------------------------------------------------------------------------
@@ -24,6 +37,7 @@ end
 function scene:create( event )
 
 	backScene = event.params.scene
+	local punteggio = event.params.punteggio
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
@@ -31,9 +45,15 @@ function scene:create( event )
     background.x = display.contentCenterX
 	background.y = display.contentCenterY
 	
-	local resumeButton = display.newText( sceneGroup, "Riprendi", display.contentCenterX, 700, native.systemFont, 100 )
- 
-    local menuButton = display.newText( sceneGroup, "Menu", display.contentCenterX, 810, native.systemFont, 100 )
+	local resumeText = "Riprendi"
+
+	if(punteggio) then
+		resumeText = "Rigioca"
+		local punteggioText = display.newText( sceneGroup, formattaPunteggio(punteggio), display.contentCenterX, 500, native.systemFont, 200 )
+	end
+
+	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 700, native.systemFont, 100 )
+    local menuButton = display.newText( sceneGroup, "Esci", display.contentCenterX, 810, native.systemFont, 100 )
 	
 	resumeButton:addEventListener( "tap", resume )
     menuButton:addEventListener( "tap", goToMenu )

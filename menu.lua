@@ -24,7 +24,7 @@ local sheetOptions = {
             height = 100
         },
         {   -- pallina
-            x = 0,
+            x = 62,
             y = 100,
             width = 30,
             height = 30
@@ -91,7 +91,8 @@ local toggleIndietroOnOff = 0
 local impostazioniButton
 local toggleImpostazioniOnOff = 1
 local soundtrackAudioBar
-local pulsanteAudio
+local pulsanteMusica
+local pulsanteSuoni
 
 -- audio
 local musicTrack
@@ -254,7 +255,7 @@ local function dragAudio( event )
         -- Move the t to the new touch position
 
         t.x = event.x - t.touchOffsetX
-        audio.setVolume( ( (t.x-xMin)/2000 ), { channel = 1 } )
+        audio.setVolume( ( (t.x-xMin)/2000 ), { channel = t.id } )
         if (t.x < xMin) then t.x = xMin end
         if (t.x > xMax) then t.x = xMax end
 
@@ -409,27 +410,47 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   }
   backGroup:insert( impostazioniButton )
 
-  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 150 )
+  -- impostazioni volume musica
+  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
+  bigliettoAudio.x = display.contentCenterX
+  bigliettoAudio.y = display.contentCenterY-200
+
+  soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
+  soundtrackAudioBar.x = display.contentCenterX
+  soundtrackAudioBar.y = display.contentCenterY-150
+  soundtrackAudioBar.myName = "audioBar"
+
+  pulsanteMusica = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
+  pulsanteMusica.x = display.contentCenterX
+  pulsanteMusica.y = display.contentCenterY-150
+  physics.addBody( pulsanteMusica, { radius=40, isSensor=true } )
+  -- canale su cui viene riprodotto il suono
+  pulsanteMusica.id = "1"
+
+  -- impostazioni volume suoni
+  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
   bigliettoAudio.x = display.contentCenterX
   bigliettoAudio.y = display.contentCenterY+300
 
   soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
   soundtrackAudioBar.x = display.contentCenterX
-  soundtrackAudioBar.y = display.contentCenterY+300
+  soundtrackAudioBar.y = display.contentCenterY+350
   soundtrackAudioBar.myName = "audioBar"
 
-  pulsanteAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
-  pulsanteAudio.x = display.contentCenterX
-  pulsanteAudio.y = display.contentCenterY+300
-  physics.addBody( pulsanteAudio, { radius=40, isSensor=true } )
-  pulsanteAudio.myName = "pulsanteAudio"
+  pulsanteSuoni = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
+  pulsanteSuoni.x = display.contentCenterX
+  pulsanteSuoni.y = display.contentCenterY+350
+  physics.addBody( pulsanteSuoni, { radius=40, isSensor=true } )
+  -- canale su cui viene riprodotto il suono
+  pulsanteSuoni.id = "2"
 
 
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )
   bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
 
-  pulsanteAudio:addEventListener( "touch", dragAudio )
+  pulsanteMusica:addEventListener( "touch", dragAudio )
+  pulsanteSuoni:addEventListener( "touch", dragAudio )
 end
 
 

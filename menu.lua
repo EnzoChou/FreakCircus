@@ -11,6 +11,9 @@ audio.setVolume( 0.5, { channel = 1 } )
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
+local physics = require( "physics" )
+physics.start()
+physics.setGravity( 0, 0 )
 
 local sheetOptions = {
     frames = {
@@ -34,8 +37,8 @@ local sheetOptions2 = {
         { -- icona opzioni, credits --> "Icon made by Freepik from www.flaticon.com"
             x = 0,
             y = 0,
-            width = 512,
-            height = 512
+            width = 192,
+            height = 192
         }
     }
 }
@@ -52,7 +55,7 @@ local sheetOptions3 = {
 }
 
 local oggettiDiScena = graphics.newImageSheet( "images/oggettini.png", sheetOptions )
-local oggettiDiScena2 = graphics.newImageSheet( "images/settings 512px.png", sheetOptions2 )
+local oggettiDiScena2 = graphics.newImageSheet( "images/ingranaggio_giallo.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/minus_111123.png", sheetOptions3 )
 
 
@@ -173,47 +176,6 @@ local function impostazioniInScena()
     gruppoInScena = impostazioniGroup
 end
 
-local function gotoImpostazioni( event )
-    if gruppoInScena ~= impostazioniGroup then
-        local phase = event.phase
-        if phase == "began" then
-            impostazioniButton:rotate( 30 )
-        elseif phase == "ended" then
-            impostazioniButton:rotate( -30 )
-            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                              x = -3000,
-                                              onStart = impostazioniInScena
-                                              }
-                         )
-            audio.play( bottoneMusic )
-            toggleIndietroButton()
-        end
-    end
-end
-
-local function dragAudio( event )
-
-    local pallina = event.target
-    local phase = event.phase
-
-    if ( "began" == phase ) then
-        -- Set touch focus on the pallina
-        display.currentStage:setFocus( pallina )
-        -- Store initial offset position
-        pallina.touchOffsetX = event.x - pallina.x
-
-    elseif ( "moved" == phase ) then
-        -- Move the pallina to the new touch position
-        pallina.x = event.x - pallina.touchOffsetX
-
-    elseif ( "ended" == phase or "cancelled" == phase ) then
-        -- Release touch focus on the pallina
-        display.currentStage:setFocus( nil )
-    end
-
-    return true  -- Prevents touch propagation to underlying objects
-end
-
 local function punteggiInScena()
     transition.to( punteggiGroup, { time = 1000, transition = easing.inOutElastic,
                                   x = 0 } )
@@ -255,6 +217,53 @@ local function tornaMenuPrincipale( event )
     end
 end
 
+-- funzioni per la pagina impostazioni
+
+local function gotoImpostazioni( event )
+    if gruppoInScena ~= impostazioniGroup then
+        local phase = event.phase
+        if phase == "began" then
+            impostazioniButton:rotate( 30 )
+        elseif phase == "ended" then
+            impostazioniButton:rotate( -30 )
+            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                              x = -3000,
+                                              onStart = impostazioniInScena
+                                              }
+                         )
+            audio.play( bottoneMusic )
+            toggleIndietroButton()
+        end
+    end
+end
+
+local function dragAudio( event )
+
+    local t = event.target
+    local phase = event.phase
+    local xMin = soundtrackAudioBar.x-500
+    local xMax = soundtrackAudioBar.x+500
+
+    if ( "began" == phase ) then
+        -- Set touch focus on the t
+        display.currentStage:setFocus( t )
+        -- Store initial offset position
+        t.touchOffsetX = event.x - t.x
+
+    elseif ( "moved" == phase ) then
+        -- Move the t to the new touch position
+
+        t.x = event.x - t.touchOffsetX
+        if (t.x < xMin) then t.x = xMin end
+        if (t.x > xMax) then t.x = xMax end
+
+    elseif ( "ended" == phase or "cancelled" == phase ) then
+        -- Release touch focus on the pallina
+        display.currentStage:setFocus( nil )
+    end
+
+    return true  -- Prevents touch propagation to underlying objects
+end
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -291,7 +300,7 @@ function scene:create( event )
   background.x = display.contentCenterX
 	background.y = display.contentCenterY
 
-  title = display.newText( backGroup, "Freak Circus", display.contentCenterX, 300, native.systemFont, 200 );
+  --title = display.newText( backGroup, "Freak Circus", display.contentCenterX, 300, native.systemFont, 200 );
 
   playButton = widget.newButton {
       x = display.contentCenterX,

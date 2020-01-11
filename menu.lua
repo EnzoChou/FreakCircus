@@ -254,6 +254,7 @@ local function dragAudio( event )
         -- Move the t to the new touch position
 
         t.x = event.x - t.touchOffsetX
+        audio.setVolume( ( (t.x-xMin)/2000 ), { channel = 1 } )
         if (t.x < xMin) then t.x = xMin end
         if (t.x > xMax) then t.x = xMax end
 

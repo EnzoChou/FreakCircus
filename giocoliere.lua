@@ -13,7 +13,7 @@ local punteggiFilePath = system.pathForFile( "punteggigiocoliere.json", system.D
 local physics = require( "physics" )
 physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
-physics.setGravity(0,19) -- raddoppiata accelerazione caduta palline 
+physics.setGravity( 0, 19 ) -- raddoppiata accelerazione caduta palline
 
 --timer
 local gameLoopTimer
@@ -233,11 +233,11 @@ local function onCollision( pallina,event )
             aggiornaText()
 
             --se le vite sono terminate
-            if(vite==0) 
+            if(vite==0)
             then
                 pauseText:removeEventListener("tap",pausa)
 
-                --rimuovo i loop    
+                --rimuovo i loop
                 timer.cancel(lancioLoopTimer)
                 timer.cancel( gameLoopTimer )
 
@@ -287,7 +287,7 @@ local function lanciaPallina()
         pallina.x = giocoliere.x-120
     end
     pallina.y = display.contentHeight-600
-    
+
     transition.to(pallina,{y=-40,time=700}) -- lancia pallina
 
     lancioTimer = timer.performWithDelay(2000,function () precipitaPallina(pallina) end,1)
@@ -299,10 +299,10 @@ end
 -- movimento giocoliere
 
 local function muoviGiocoliere( event )
- 
+
     local giocoliere = event.target
     local phase = event.phase
- 
+
     if ( "began" == phase ) then
        display.currentStage:setFocus(giocoliere )
        giocoliere.touchOffsetX = event.x -giocoliere.x
@@ -311,12 +311,12 @@ local function muoviGiocoliere( event )
        if(giocoliere.x < event.x-giocoliere.touchOffsetX) then
         giocoliere:setSequence("movimento a destra")
        else
-        giocoliere:setSequence("movimento a sinistra") 
+        giocoliere:setSequence("movimento a sinistra")
        end
 
        giocoliere:play()
        giocoliere.x = event.x -giocoliere.touchOffsetX
- 
+
     elseif ( "ended" == phase or "cancelled" == phase ) then
         display.currentStage:setFocus( nil )
     end
@@ -416,7 +416,7 @@ function scene:show( event )
         giocoliere:play()
         timer.resume(gameLoopTimer)
         timer.resume(lancioLoopTimer)
-        
+
         if(seconds==0) then
             --primo lancio
             lanciaPallina()

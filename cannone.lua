@@ -292,6 +292,34 @@ local function colpito( event )
 end
 
 
+
+
+local function startGame()
+    mostraScritta("START",500)
+
+    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0) --inizia il gioco
+
+    --muovi gli oggetti
+    ruotaCannone()
+    muoviBersaglio()
+    
+    --aggiungi i listener
+    pauseText:addEventListener("tap",pausa)
+    cannone:addEventListener( "tap",sparaPallaDiCannone )
+    Runtime:addEventListener( "collision", colpito )
+end
+
+local function start()
+    --countdown
+    local countdown = 3
+    mostraScritta(countdown,1000)
+    timer.performWithDelay(1000,function () countdown= countdown-1 mostraScritta(countdown,1000) end,countdown-1)
+
+    --fa partire il gioco
+    timer.performWithDelay(countdown*1000,startGame,1)
+end
+
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -303,9 +331,6 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     physics.pause()
-
-    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
-    timer.pause(gameLoopTimer)
 
     -- Set up display groups
     backGroup = display.newGroup()
@@ -354,7 +379,6 @@ function scene:create( event )
     cannone.anchorX =  130/321 --175,642/321
     cannone.anchorY = 176,203/234
     physics.addBody(cannone,"static")
-    cannone:addEventListener( "tap",sparaPallaDiCannone )
 
     local pivotJoint = physics.newJoint( "pivot", cannone, pallaDiCannone, pallaDiCannone.x, pallaDiCannone.y )
 
@@ -365,8 +389,6 @@ function scene:create( event )
     puntiText = display.newText( uiGroup, "Punteggio: " .. punti, 900, 90, native.systemFont, 100 )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
     pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
-
-    pauseText:addEventListener("tap",pausa)
 
 end
 
@@ -384,14 +406,15 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
 
-        -- all'inizio del gioco
         if(secondsLeft==totalTime) then
-            ruotaCannone()
-            muoviBersaglio()
+            -- all'inizio del gioco
+            start()
+        else
+            --durante il gioco
+            timer.resume(gameLoopTimer)
+            Runtime:addEventListener( "collision", colpito )
         end
 
-        timer.resume(gameLoopTimer)
-        Runtime:addEventListener( "collision", colpito )
 	end
 end
 

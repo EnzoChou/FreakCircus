@@ -1,4 +1,5 @@
 local composer = require( "composer" )
+local score = require("score")
 
 local scene = composer.newScene()
 local backScene
@@ -48,8 +49,19 @@ function scene:create( event )
 	local resumeText = "Riprendi"
 
 	if(punteggio) then
+		--se la partita è finita
 		resumeText = "Rigioca"
-		local punteggioText = display.newText( sceneGroup, formattaPunteggio(punteggio), display.contentCenterX, 500, native.systemFont, 200 )
+
+		local filePath = system.pathForFile( "punteggi".. backScene ..".json", system.DocumentsDirectory )
+		local isRecord = punteggio == score.carica(filePath)[1] -- se il nuovo punteggio è il più alto è in cima alla lista
+		local text = formattaPunteggio(punteggio)
+
+		--se il punteggio è il nuovo record
+		if(isRecord) then
+			text = text .. " (Record)"
+		end
+
+		local punteggioText = display.newText( sceneGroup, text, display.contentCenterX, 500, native.systemFont, 200 )
 	end
 
 	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 700, native.systemFont, 100 )

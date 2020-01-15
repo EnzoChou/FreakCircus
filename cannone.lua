@@ -15,6 +15,8 @@ physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
 
 local gameLoopTimer
+local rotazioneCannoneTimer
+local movimentoBersaglioTimer
 
 local sheetOptions = {
     frames = {
@@ -141,7 +143,7 @@ end
 
 local function ruotaCannone()
     ruotaCannoneAntiOrario()
-    timer.performWithDelay(cannoneRoundTripDelay, ruotaCannoneAntiOrario, 0 )
+    rotazioneCannoneTimer = timer.performWithDelay(cannoneRoundTripDelay, ruotaCannoneAntiOrario, 0 )
 end
 
 
@@ -168,7 +170,7 @@ end
 
 local function muoviBersaglio()
     muoviBersaglioASinistra()
-    timer.performWithDelay(bersaglioRoundTripDelay, muoviBersaglioASinistra, 0 )
+    movimentoBersaglioTimer = timer.performWithDelay(bersaglioRoundTripDelay, muoviBersaglioASinistra, 0 )
 end
 
 
@@ -411,7 +413,10 @@ function scene:show( event )
             start()
         else
             --durante il gioco
+            transition.resume()
             timer.resume(gameLoopTimer)
+            timer.resume(movimentoBersaglioTimer)
+            timer.resume(rotazioneCannoneTimer)
             Runtime:addEventListener( "collision", colpito )
         end
 
@@ -434,6 +439,8 @@ function scene:hide( event )
             timer.pause(gameLoopTimer)
         end
 
+        timer.pause(rotazioneCannoneTimer)
+        timer.pause(movimentoBersaglioTimer)
         transition.pause()
         physics.pause()
 	elseif ( phase == "did" ) then

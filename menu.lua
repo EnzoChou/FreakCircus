@@ -11,10 +11,6 @@ audio.setVolume( 0.5, { channel = 1 } )
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local physics = require( "physics" )
-physics.start()
-physics.setGravity( 0, 0 )
-
 local sheetOptions = {
     frames = {
         {   -- pulsante/biglietto
@@ -423,7 +419,6 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   pulsanteMusica = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
   pulsanteMusica.x = display.contentCenterX
   pulsanteMusica.y = display.contentCenterY-150
-  physics.addBody( pulsanteMusica, { radius=40, isSensor=true } )
   -- canale su cui viene riprodotto il suono
   pulsanteMusica.id = "1"
 
@@ -440,7 +435,6 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   pulsanteSuoni = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
   pulsanteSuoni.x = display.contentCenterX
   pulsanteSuoni.y = display.contentCenterY+350
-  physics.addBody( pulsanteSuoni, { radius=40, isSensor=true } )
   -- canale su cui viene riprodotto il suono
   pulsanteSuoni.id = "2"
 

@@ -343,6 +343,30 @@ local function gameLoop()
     updateTime()
 end
 
+local function startGame()
+    mostraScritta("START",500)
+
+    --inizia il gioco
+    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
+    lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
+
+    --lancia la prima pallina
+    lanciaPallina()
+    
+    --aggiungi i listener
+    pauseText:addEventListener("tap",pausa)
+    giocoliere:addEventListener("touch",muoviGiocoliere)
+end
+
+local function start ()
+      --countdown
+      local countdown = 3
+      mostraScritta(countdown,1000)
+      timer.performWithDelay(1000,function () countdown = countdown-1 mostraScritta(countdown,1000) end,countdown-1)
+  
+      --fa partire il gioco
+      timer.performWithDelay(countdown*1000,startGame,1)
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -354,12 +378,6 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     physics.pause()
-
-    gameLoopTimer = timer.performWithDelay(1000,gameLoop,0)
-    lancioLoopTimer = timer.performWithDelay(2000,lanciaPallina,0)
-
-    timer.pause(gameLoopTimer)
-    timer.pause(lancioLoopTimer)
 
     -- Set up display groups
     backGroup = display.newGroup()
@@ -389,14 +407,11 @@ function scene:create( event )
     clockText = display.newText( uiGroup, formatTime(seconds), display.contentCenterX, 90, native.systemFont, 100 )
     pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
 
-    pauseText:addEventListener("tap",pausa)
-
     giocoliere = display.newSprite( mainGroup,oggettiDiScena, sequenzaGiocoliere )
-    giocoliere.x = display.contentCenterX
+    giocoliere.x = display.contentCenterX-300
     giocoliere.y = display.contentHeight - 520
     giocoliere.myName = "giocoliere"
     giocoliere:scale(2,2)
-    giocoliere:addEventListener("touch",muoviGiocoliere)
     physics.addBody(giocoliere,"static")
 end
 
@@ -414,13 +429,13 @@ function scene:show( event )
         -- Code here runs when the scene is entirely on screen
         physics.start()
         giocoliere:play()
-        timer.resume(gameLoopTimer)
-        timer.resume(lancioLoopTimer)
 
         if(seconds==0) then
-            --primo lancio
-            lanciaPallina()
+            --all'inizio del gioco
+            start()
         else
+            timer.resume(gameLoopTimer)
+            timer.resume(lancioLoopTimer)
             timer.resume(lancioTimer)
         end
 	end

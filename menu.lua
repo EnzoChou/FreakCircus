@@ -381,7 +381,7 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-
+    tornaMenuPrincipale( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
     -- parte la musica
@@ -404,8 +404,6 @@ function scene:hide( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
     -- ferma la musica
-    tornaMenuPrincipale( event )
-    tornaMenuPrincipale( event )
     audio.stop( 1 )
 	end
 end

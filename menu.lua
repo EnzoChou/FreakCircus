@@ -83,13 +83,6 @@ local punteggiGiocoliereButton
 local indietroButton
 local toggleIndietroOnOff = 0
 
--- bottone impostazioni
-local impostazioniButton
-local toggleImpostazioniOnOff = 1
-local soundtrackAudioBar
-local pulsanteMusica
-local pulsanteSuoni
-
 -- audio
 local musicTrack
 local bottoneMusic
@@ -167,12 +160,6 @@ local function gotoGiochi( event )
     end
 end
 
-local function impostazioniInScena()
-    transition.to( impostazioniGroup, { time = 1000, transition = easing.inOutElastic,
-                                        x = 0 } )
-    gruppoInScena = impostazioniGroup
-end
-
 local function punteggiInScena()
     transition.to( punteggiGroup, { time = 1000, transition = easing.inOutElastic,
                                   x = 0 } )
@@ -203,64 +190,39 @@ end
 
 local function tornaMenuPrincipale( event )
     local phase = event.phase
-    if phase == "ended" then
+    if ( phase == "ended" or phase == "will" ) then
         if ( gruppoInScena ~= principaleGroup ) then
             transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                             x = 3000,
                                             onStart = menuPrincipale } )
             audio.play( bottoneMusic )
             toggleIndietroButton()
+            print( "questa funzione viene chiamata" )
         end
     end
 end
 
 -- funzioni per la pagina impostazioni
 
-local function gotoImpostazioni( event )
-    if gruppoInScena ~= impostazioniGroup then
-        local phase = event.phase
-        if phase == "began" then
-            impostazioniButton:rotate( 30 )
-        elseif phase == "ended" then
-            impostazioniButton:rotate( -30 )
-            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                              x = -3000,
-                                              onStart = impostazioniInScena
-                                              }
-                         )
-            audio.play( bottoneMusic )
-            toggleIndietroButton()
-        end
-    end
+local function impostazioniInScena( )
+    composer.gotoScene( "impostazioni" , { time=800, effect = "crossFade" } )
 end
 
-local function dragAudio( event )
-
-    local t = event.target
+local function gotoImpostazioni( event )
     local phase = event.phase
-    local xMin = soundtrackAudioBar.x-500
-    local xMax = soundtrackAudioBar.x+500
-
-    if ( "began" == phase ) then
-        -- Set touch focus on the t
-        display.currentStage:setFocus( t )
-        -- Store initial offset position
-        t.touchOffsetX = event.x - t.x
-
-    elseif ( "moved" == phase ) then
-        -- Move the t to the new touch position
-
-        t.x = event.x - t.touchOffsetX
-        audio.setVolume( ( (t.x-xMin)/2000 ), { channel = t.id } )
-        if (t.x < xMin) then t.x = xMin end
-        if (t.x > xMax) then t.x = xMax end
-
-    elseif ( "ended" == phase or "cancelled" == phase ) then
-        -- Release touch focus on the pallina
-        display.currentStage:setFocus( nil )
+    if phase == "began" then
+        impostazioniButton:rotate( 30 )
+    elseif phase == "ended" then
+        impostazioniButton:rotate( -30 )
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000,
+                                          onStart = impostazioniInScena
+                                      }
+                     )
+        audio.play( bottoneMusic )
+        gruppoInScena = impostazioniGroup
+        toggleIndietroButton()
     end
-
-    return true  -- Prevents touch propagation to underlying objects
 end
 
 -- -----------------------------------------------------------------------------------
@@ -297,8 +259,6 @@ function scene:create( event )
 	background = display.newImageRect( backGroup, "images/sfondo1.png", 3000, 1280 )
   background.x = display.contentCenterX
 	background.y = display.contentCenterY
-
-  --title = display.newText( backGroup, "Freak Circus", display.contentCenterX, 300, native.systemFont, 200 );
 
   playButton = widget.newButton {
       x = display.contentCenterX,
@@ -406,45 +366,10 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   }
   backGroup:insert( impostazioniButton )
 
-  -- impostazioni volume musica
-  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
-  bigliettoAudio.x = display.contentCenterX
-  bigliettoAudio.y = display.contentCenterY-200
-
-  soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
-  soundtrackAudioBar.x = display.contentCenterX
-  soundtrackAudioBar.y = display.contentCenterY-150
-  soundtrackAudioBar.myName = "audioBar"
-
-  pulsanteMusica = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
-  pulsanteMusica.x = display.contentCenterX
-  pulsanteMusica.y = display.contentCenterY-150
-  -- canale su cui viene riprodotto il suono
-  pulsanteMusica.id = "1"
-
-  -- impostazioni volume suoni
-  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
-  bigliettoAudio.x = display.contentCenterX
-  bigliettoAudio.y = display.contentCenterY+300
-
-  soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
-  soundtrackAudioBar.x = display.contentCenterX
-  soundtrackAudioBar.y = display.contentCenterY+350
-  soundtrackAudioBar.myName = "audioBar"
-
-  pulsanteSuoni = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
-  pulsanteSuoni.x = display.contentCenterX
-  pulsanteSuoni.y = display.contentCenterY+350
-  -- canale su cui viene riprodotto il suono
-  pulsanteSuoni.id = "2"
-
-
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )
   bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
 
-  pulsanteMusica:addEventListener( "touch", dragAudio )
-  pulsanteSuoni:addEventListener( "touch", dragAudio )
 end
 
 
@@ -479,6 +404,8 @@ function scene:hide( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
     -- ferma la musica
+    tornaMenuPrincipale( event )
+    tornaMenuPrincipale( event )
     audio.stop( 1 )
 	end
 end

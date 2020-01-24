@@ -74,6 +74,8 @@ local toggleImpostazioniOnOff = 1
 local soundtrackAudioBar
 local pulsanteMusica
 local pulsanteSuoni
+local testoSFX
+local testoAudio
 
 -- audio
 local musicTrack
@@ -116,12 +118,6 @@ local function tornaMenuPrincipale( event )
             toggleIndietroButton()
         end
     end
-end
-
-local function menuPrincipale()
-    transition.to( giochiGroup, { time = 1000, transition = easing.inOutElastic,
-                                  x = 0 } )
-    gruppoInScena = giochiGroup
 end
 
 local function tornaMenuPrincipale( event )
@@ -201,37 +197,45 @@ function scene:create( event )
 
 
   -- impostazioni volume musica
-  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
+  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 200 )
   bigliettoAudio.x = display.contentCenterX
   bigliettoAudio.y = display.contentCenterY-200
 
   soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
   soundtrackAudioBar.x = display.contentCenterX
-  soundtrackAudioBar.y = display.contentCenterY-150
+  soundtrackAudioBar.y = display.contentCenterY-200
   soundtrackAudioBar.myName = "audioBar"
 
   pulsanteMusica = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
   pulsanteMusica.x = display.contentCenterX
-  pulsanteMusica.y = display.contentCenterY-150
+  pulsanteMusica.y = display.contentCenterY-200
   -- canale su cui viene riprodotto il suono
   pulsanteMusica.id = "1"
 
+  testoAudio = display.newText( backGroup, "Audio", display.contentCenterX-930, display.contentCenterY-200, native.systemFont, 120 )
+  testoAudio:setFillColor( 1, 1, 0 )
+
   -- impostazioni volume suoni
-  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 400 )
+
+
+
+  bigliettoAudio = display.newImageRect( impostazioniGroup, oggettiDiScena, 1, 1500, 200 )
   bigliettoAudio.x = display.contentCenterX
   bigliettoAudio.y = display.contentCenterY+300
 
   soundtrackAudioBar = display.newImageRect( impostazioniGroup, oggettiDiScena3, 1, 1200, 20 )
   soundtrackAudioBar.x = display.contentCenterX
-  soundtrackAudioBar.y = display.contentCenterY+350
+  soundtrackAudioBar.y = display.contentCenterY+310
   soundtrackAudioBar.myName = "audioBar"
 
   pulsanteSuoni = display.newImageRect( impostazioniGroup, oggettiDiScena, 2, 40, 40 )
   pulsanteSuoni.x = display.contentCenterX
-  pulsanteSuoni.y = display.contentCenterY+350
+  pulsanteSuoni.y = display.contentCenterY+310
   -- canale su cui viene riprodotto il suono
   pulsanteSuoni.id = "2"
 
+  testoSFX = display.newText( backGroup, "SFX", display.contentCenterX-930, display.contentCenterY+300, native.systemFont, 120 )
+  testoSFX:setFillColor( 1, 1, 0 )
 
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )

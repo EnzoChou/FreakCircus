@@ -93,6 +93,10 @@ local function gotoCannone( event )
     if phase == "ended" then
         audio.play( bottoneMusic )
         composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000
+                                        }
+                      )
     end
 end
 
@@ -101,6 +105,10 @@ local function gotoGiocoliere( event )
     if phase == "ended" then
         audio.play( bottoneMusic )
         composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000
+                                        }
+                      )
     end
 end
 

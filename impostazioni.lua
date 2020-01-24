@@ -101,25 +101,6 @@ local function toggleImpostazioniButton()
     end
 end
 
-local function menuPrincipale()
-    audio.play( bottoneMusic )
-    composer.gotoScene( "menu" , { time=800, effect = "crossFade" } )
-    gruppoInScena = principaleGroup
-end
-
-local function tornaMenuPrincipale( event )
-    local phase = event.phase
-    if phase == "ended" then
-        if ( gruppoInScena ~= principaleGroup ) then
-            transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                            x = 3000,
-                                            onStart = menuPrincipale } )
-            audio.play( bottoneMusic )
-            toggleIndietroButton()
-        end
-    end
-end
-
 local function tornaMenuPrincipale( event )
     local phase = event.phase
         if phase == "ended" then

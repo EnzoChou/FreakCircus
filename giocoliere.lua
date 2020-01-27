@@ -133,7 +133,7 @@ local sheetOptions4 = {
 local oggettiDiScena = graphics.newImageSheet( "images/giocoliere.png", sheetOptions )
 local oggettiDiScena2 = graphics.newImageSheet( "images/oggettini.png", sheetOptions2 )
 local oggettiDiScena3 = graphics.newImageSheet( "images/pavimento.png", sheetOptions3 )
-local oggettiDiScena4 = graphics.newImageSheet( "images/OGGETTONI.png", sheetOptions4 )
+local oggettiDiScena4 = graphics.newImageSheet( "images/oggettoni.png", sheetOptions4 )
 
 local vite = 10
 

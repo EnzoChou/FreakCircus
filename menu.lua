@@ -196,18 +196,14 @@ local function menuPrincipale()
     gruppoInScena = principaleGroup
 end
 
-local function tornaMenuPrincipale( event )
-    local phase = event.phase
-    if ( phase == "ended" or phase == "will" ) then
+local function tornaMenuPrincipale()
         if ( gruppoInScena ~= principaleGroup ) then
             transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                             x = 3000,
                                             onStart = menuPrincipale } )
             audio.play( bottoneMusic )
             toggleIndietroButton()
-            print( "questa funzione viene chiamata" )
         end
-    end
 end
 
 -- funzioni per la pagina impostazioni
@@ -389,7 +385,6 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-    tornaMenuPrincipale( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
     -- parte la musica
@@ -412,6 +407,7 @@ function scene:hide( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
     -- ferma la musica
+    tornaMenuPrincipale()
     audio.stop( 1 )
 	end
 end

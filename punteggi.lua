@@ -5,13 +5,17 @@ local game
 
 local score = require("score")
 
-local punteggi
+local punteggi = {}
 local filePath
+local sceneGroup
+
+local url = "http://13.73.156.182:8080/scores/"
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
+
 
 local function goToMenu()
     composer.gotoScene( "menu" , { time=10 } )
@@ -30,6 +34,22 @@ local function formattaPunteggio(p)
 	return p
 end
 
+local function riempimento( punteggio )
+    punteggi = punteggio
+    for i = 1, 10 do
+        if ( punteggi[i] ) then
+            local yPos = 0 + ( i * 120 )
+
+            local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 80 )
+      rank.anchorX = 1
+
+      punteggi[i] = formattaPunteggio(punteggi[i])
+            local punteggio = display.newText( sceneGroup, punteggi[i], display.contentCenterX-30, yPos, native.systemFont, 80 )
+            punteggio.anchorX = 0
+        end
+    end
+end
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -40,26 +60,27 @@ function scene:create( event )
     game = event.params.game
     filePath = system.pathForFile( "punteggi".. game ..".json", system.DocumentsDirectory )
 
-	punteggi = score.carica(filePath)
+	score.carica( url .. game, riempimento )
 
-	local sceneGroup = self.view
+	sceneGroup = self.view
 	local background = display.newImageRect( sceneGroup, "images/sfondo2.png", 3000, 1280)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
-    
+--[[
     for i = 1, 10 do
         if ( punteggi[i] ) then
             local yPos = 0 + ( i * 120 )
 
             local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 80 )
 			rank.anchorX = 1
-			
+
 			punteggi[i] = formattaPunteggio(punteggi[i])
             local punteggio = display.newText( sceneGroup, punteggi[i], display.contentCenterX-30, yPos, native.systemFont, 80 )
             punteggio.anchorX = 0
         end
     end
-	
+    --]]
+
 	local goToMenuButton = display.newText( sceneGroup, "Indietro", display.contentCenterX-900, 60, native.systemFont, 100 )
 	goToMenuButton:addEventListener( "tap", goToMenu )
 end

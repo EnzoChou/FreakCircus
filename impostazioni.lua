@@ -104,6 +104,7 @@ end
 local function tornaMenuPrincipale( event )
     local phase = event.phase
         if phase == "ended" then
+            audio.play( bottoneMusic )
             composer.gotoScene( "menu" , { time=800, effect = "crossFade" } )
         end
 end

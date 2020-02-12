@@ -4,7 +4,7 @@ local scene = composer.newScene()
 
 local score = require("score")
 
-local punteggiFilePath = system.pathForFile( "punteggigiocoliere.json", system.DocumentsDirectory )
+local game = "giocoliere"
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
@@ -14,6 +14,7 @@ local physics = require( "physics" )
 physics.setReportCollisionsInContentCoordinates( true )
 physics.start()
 physics.setGravity( 0, 19 ) -- raddoppiata accelerazione caduta palline
+local record
 
 --timer
 local gameLoopTimer
@@ -168,12 +169,16 @@ local clockText
 local pauseText
 
 local function endGame()
-    score.salva(punteggiFilePath,seconds)
+    score.salva(game,seconds)
     composer.gotoScene( "pausa", { time=2000,params = {scene = "giocoliere",punteggio = seconds} } )
 end
 
+local function associaRecord( punteggi )
+    record = punteggi[1]
+end
+
 local function pausa()
-    composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere"} })
+    composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere", record = record} })
 end
 
 -- aggiorna vite
@@ -352,7 +357,7 @@ local function startGame()
 
     --lancia la prima pallina
     lanciaPallina()
-    
+
     --aggiungi i listener
     pauseText:addEventListener("tap",pausa)
     giocoliere:addEventListener("touch",muoviGiocoliere)
@@ -363,7 +368,7 @@ local function start ()
       local countdown = 3
       mostraScritta(countdown,1000)
       timer.performWithDelay(1000,function () countdown = countdown-1 mostraScritta(countdown,1000) end,countdown-1)
-  
+
       --fa partire il gioco
       timer.performWithDelay(countdown*1000,startGame,1)
 end
@@ -388,6 +393,8 @@ function scene:create( event )
 
 	uiGroup = display.newGroup()
 	sceneGroup:insert( uiGroup )
+
+  score.carica( game, associaRecord )
 
     local background = display.newImageRect( backGroup, "images/sfondo2.png", 3000, 1280 )
     background.x = display.contentCenterX

@@ -4,7 +4,7 @@ local scene = composer.newScene()
 
 local score = require("score")
 
-local punteggiFilePath = system.pathForFile( "punteggicannone.json", system.DocumentsDirectory )
+local game = "cannone"
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
@@ -17,6 +17,7 @@ physics.start()
 local gameLoopTimer
 local rotazioneCannoneTimer
 local movimentoBersaglioTimer
+local record
 
 local sheetOptions = {
     frames = {
@@ -198,9 +199,13 @@ local function pausa()
     composer.gotoScene("pausa",{time=10,params = {scene = "cannone"} })
 end
 
+local function associaRecord( punteggi )
+    record = punteggi[1]
+end
+
 local function endGame()
-    score.salva(punteggiFilePath,punti)
-    composer.gotoScene( "pausa", { time=2000,params = {scene = "cannone",punteggio = punti} } )
+    score.salva(game,punti)
+    composer.gotoScene( "pausa", { time=2000,params = {scene = "cannone", punteggio = punti, record = record} } )
 end
 
 
@@ -304,7 +309,7 @@ local function startGame()
     --muovi gli oggetti
     ruotaCannone()
     muoviBersaglio()
-    
+
     --aggiungi i listener
     pauseText:addEventListener("tap",pausa)
     cannone:addEventListener( "tap",sparaPallaDiCannone )
@@ -343,6 +348,8 @@ function scene:create( event )
 
 	uiGroup = display.newGroup()
 	sceneGroup:insert( uiGroup )
+
+  score.carica( game, associaRecord )
 
     local background = display.newImageRect( backGroup, "images/sfondo2.png", 3000, 1280 )
     background.x = display.contentCenterX

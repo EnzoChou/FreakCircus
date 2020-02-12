@@ -11,7 +11,7 @@ local backScene
 local function resume()
     composer.gotoScene( backScene , { time=10 } )
 end
- 
+
 local function goToMenu()
     composer.gotoScene( "menu" , { time=10 } )
     composer.removeScene(backScene) --rimuove la scena se esiste
@@ -39,13 +39,14 @@ function scene:create( event )
 
 	backScene = event.params.scene
 	local punteggio = event.params.punteggio
+  local record = event.params.record
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	local background = display.newImageRect( sceneGroup, "images/sfondo2.png", 3000, 1280)
     background.x = display.contentCenterX
 	background.y = display.contentCenterY
-	
+
 	local resumeText = "Riprendi"
 
 	if(punteggio) then
@@ -53,7 +54,7 @@ function scene:create( event )
 		resumeText = "Rigioca"
 
 		local filePath = system.pathForFile( "punteggi".. backScene ..".json", system.DocumentsDirectory )
-		local isRecord = punteggio == score.carica(filePath)[1] -- se il nuovo punteggio è il più alto è in cima alla lista
+		local isRecord = punteggio > record -- se il nuovo punteggio è il più alto è in cima alla lista
 		local text = formattaPunteggio(punteggio)
 
 		--se il punteggio è il nuovo record
@@ -66,7 +67,7 @@ function scene:create( event )
 
 	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 700, native.systemFont, 100 )
     local menuButton = display.newText( sceneGroup, "Esci", display.contentCenterX, 810, native.systemFont, 100 )
-	
+
 	resumeButton:addEventListener( "tap", resume )
     menuButton:addEventListener( "tap", goToMenu )
 end

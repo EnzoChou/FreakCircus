@@ -1,10 +1,12 @@
 local score = {}
 local json = require( "json" )
 
+local url = "http://13.73.156.182:8080/scores/"
+
 local network = require( "network" )
 local callback
 
-local function networkListener( event )
+local function getNetworkListener( event )
     local punteggi = {}
     if ( event.isError ) then
         print( "Network error: ", event.response )
@@ -17,18 +19,28 @@ local function networkListener( event )
     callback( punteggi )
 end
 
+local function postNetworkListener( event )
 
-local function carica( url, riempimento )
+    if ( event.isError ) then
+        print( "Network error: ", event.response )
+    else
+        print ( "RESPONSE: " .. event.response )
+    end
+end
+
+
+local function carica( game, riempimento )
+    local link = url .. game
     callback = riempimento
     -- Access to server
-    network.request( url, "GET", networkListener )
+    network.request( link, "GET", getNetworkListener )
 end
 
 
 
 local function salva( url,punteggio )
     -- Access to server
-    local response = network.request( url, "POST", networkListener )
+    local response = network.request( url, "POST", postNetworkListener )
     --local file = io.open( filePath, "r" )
     local punteggi = {}
 
@@ -57,15 +69,6 @@ local function salva( url,punteggio )
     --file = io.open( filePath, "w" )
     --file:write( json.encode( punteggi ) )
     --io.close( file )
-end
-
-
-local function caricaOnline( filePath, arrayJson )
-    local table = json.decode( arrayJson )
-    for k,v in pairs( table ) do
-        print( v.punteggio )
-        salva( filePath, v.punteggio )
-    end
 end
 
 

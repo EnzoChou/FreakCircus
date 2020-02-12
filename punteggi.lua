@@ -9,8 +9,6 @@ local punteggi = {}
 local filePath
 local sceneGroup
 
-local url = "http://13.73.156.182:8080/scores/"
-
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -58,9 +56,8 @@ end
 function scene:create( event )
 
     game = event.params.game
-    filePath = system.pathForFile( "punteggi".. game ..".json", system.DocumentsDirectory )
 
-	score.carica( url .. game, riempimento )
+	score.carica( game, riempimento )
 
 	sceneGroup = self.view
 	local background = display.newImageRect( sceneGroup, "images/sfondo2.png", 3000, 1280)

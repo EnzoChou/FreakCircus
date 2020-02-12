@@ -38,37 +38,11 @@ end
 
 
 
-local function salva( url,punteggio )
+local function salva( game, punteggio )
+    local link = url .. game
     -- Access to server
-    local response = network.request( url, "POST", postNetworkListener )
-    --local file = io.open( filePath, "r" )
-    local punteggi = {}
+    local response = network.request( link.."?".."score="..punteggio, "POST", postNetworkListener )
 
-    --if file then
-    --    local contents = file:read( "*a" )
-    --    punteggi = json.decode( contents )
-    --    if
-    --    table.insert( punteggi, punteggio)
-
-        -- Ordina punteggi
-    --    local function compare( a, b )
-    --         return a > b
-    --    end
-    --    table.sort( punteggi, compare )
-
-        -- salva max 10 risultati
-    --    table.remove(punteggi,11)
-
-    --    io.close( file )
-    --else
-    --    table.insert( punteggi, punteggio)
-    --end
-
-
-    --sovrascrivi il file (o crealo se non esiste)
-    --file = io.open( filePath, "w" )
-    --file:write( json.encode( punteggi ) )
-    --io.close( file )
 end
 
 

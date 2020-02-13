@@ -53,8 +53,7 @@ function scene:create( event )
 		--se la partita è finita
 		resumeText = "Rigioca"
 
-		local filePath = system.pathForFile( "punteggi".. backScene ..".json", system.DocumentsDirectory )
-		local isRecord = punteggio > record -- se il nuovo punteggio è il più alto è in cima alla lista
+		local isRecord = punteggio > record -- se il nuovo punteggio va inserito nella classifica top 10
 		local text = formattaPunteggio(punteggio)
 
 		--se il punteggio è il nuovo record

@@ -174,7 +174,7 @@ local function endGame()
 end
 
 local function associaRecord( punteggi )
-    record = punteggi[1]
+    record = punteggi[10]
 end
 
 local function pausa()

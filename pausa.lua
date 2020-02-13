@@ -48,6 +48,7 @@ function scene:create( event )
 	background.y = display.contentCenterY
 
 	local resumeText = "Riprendi"
+	local menuText = "Esci"
 
 	if(punteggio) then
 		--se la partita è finita
@@ -59,13 +60,17 @@ function scene:create( event )
 		--se il punteggio è il nuovo record
 		if(isRecord) then
 			text = text .. " (Record)"
+			menuText = "Salva ed esci"
+			local nome = native.newTextField( display.contentCenterX-200, 500, 600, 100 )
+	        nome.placeholder = "Nome"
+		    sceneGroup:insert(nome)
 		end
-
-		local punteggioText = display.newText( sceneGroup, text, display.contentCenterX, 500, native.systemFont, 200 )
+		
+		local punteggioText = display.newText( sceneGroup, text, display.contentCenterX, 300, native.systemFont, 200 )
 	end
 
-	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 700, native.systemFont, 100 )
-    local menuButton = display.newText( sceneGroup, "Esci", display.contentCenterX, 810, native.systemFont, 100 )
+	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 810, native.systemFont, 100 )
+    local menuButton = display.newText( sceneGroup, menuText, display.contentCenterX, 700, native.systemFont, 100 )
 
 	resumeButton:addEventListener( "tap", resume )
     menuButton:addEventListener( "tap", goToMenu )

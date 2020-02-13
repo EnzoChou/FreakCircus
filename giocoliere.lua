@@ -169,8 +169,7 @@ local clockText
 local pauseText
 
 local function endGame()
-    score.salva(game,seconds)
-    composer.gotoScene( "pausa", { time=2000,params = {scene = "giocoliere",punteggio = seconds} } )
+    composer.gotoScene( "pausa", { time=2000,params = {scene = "giocoliere",punteggio = seconds, record = record} } )
 end
 
 local function associaRecord( punteggi )
@@ -178,7 +177,7 @@ local function associaRecord( punteggi )
 end
 
 local function pausa()
-    composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere", record = record} })
+    composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere"} })
 end
 
 -- aggiorna vite

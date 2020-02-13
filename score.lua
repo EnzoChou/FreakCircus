@@ -38,10 +38,10 @@ end
 
 
 
-local function salva( game, punteggio )
+local function salva( game, punteggio, nome )
     local link = url .. game
     -- Access to server
-    local response = network.request( link.."?".."score="..punteggio, "POST", postNetworkListener )
+    local response = network.request( link.."?".."score="..punteggio.."&user="..nome, "POST", postNetworkListener )
 
 end
 

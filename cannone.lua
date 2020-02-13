@@ -204,7 +204,6 @@ local function associaRecord( punteggi )
 end
 
 local function endGame()
-    score.salva(game,punti)
     composer.gotoScene( "pausa", { time=2000,params = {scene = "cannone", punteggio = punti, record = record} } )
 end
 

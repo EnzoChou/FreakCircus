@@ -1,18 +1,27 @@
 local composer = require( "composer" )
 local score = require("score")
-
+local tfi = require("textfieldInput")
 local scene = composer.newScene()
 local backScene
+local punteggio
+local nome
+local inserimentoNome
 
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local function resume()
+    if ( nome~=nil ) then
+        score.salva( backScene, punteggio, nome )
+    end
     composer.gotoScene( backScene , { time=10 } )
 end
 
 local function goToMenu()
+    if ( nome~=nil ) then
+        score.salva( backScene, punteggio, nome )
+    end
     composer.gotoScene( "menu" , { time=10 } )
     composer.removeScene(backScene) --rimuove la scena se esiste
 end
@@ -30,6 +39,23 @@ local function formattaPunteggio(p)
 	return p
 end
 
+local function salvaNome( event )
+    if ( event.phase == "began" ) then
+        -- User begins editing "defaultField"
+
+    elseif ( event.phase == "ended" or event.phase == "submitted" ) then
+        -- Output resulting text from "defaultField"
+        nome = event.target.text
+
+    elseif ( event.phase == "editing" ) then
+        --print( event.newCharacters )
+        --print( event.oldText )
+        --print( event.startPosition )
+        nome = event.text
+        print( nome )
+    end
+end
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -38,7 +64,7 @@ end
 function scene:create( event )
 
 	backScene = event.params.scene
-	local punteggio = event.params.punteggio
+	punteggio = event.params.punteggio
   local record = event.params.record
 
 	local sceneGroup = self.view
@@ -58,21 +84,22 @@ function scene:create( event )
 		local text = formattaPunteggio(punteggio)
 
 		--se il punteggio è il nuovo record
-		if(isRecord) then
+		if( isRecord ) then
 			text = text .. " (Record)"
 			menuText = "Salva ed esci"
-			local nome = native.newTextField( display.contentCenterX-200, 500, 600, 100 )
-	        nome.placeholder = "Nome"
-		    sceneGroup:insert(nome)
+			inserimentoNome = native.newTextField( display.contentCenterX-200, 500, 600, 100 )
+	    inserimentoNome.placeholder = "Nome"
+		  sceneGroup:insert(inserimentoNome)
+      inserimentoNome:addEventListener( "userInput", salvaNome )
 		end
-		
+
 		local punteggioText = display.newText( sceneGroup, text, display.contentCenterX, 300, native.systemFont, 200 )
 	end
 
 	local resumeButton = display.newText( sceneGroup, resumeText, display.contentCenterX, 810, native.systemFont, 100 )
     local menuButton = display.newText( sceneGroup, menuText, display.contentCenterX, 700, native.systemFont, 100 )
 
-	resumeButton:addEventListener( "tap", resume )
+	  resumeButton:addEventListener( "tap", resume )
     menuButton:addEventListener( "tap", goToMenu )
 end
 

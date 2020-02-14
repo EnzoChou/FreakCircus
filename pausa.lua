@@ -64,7 +64,7 @@ function scene:create( event )
 
 	backScene = event.params.scene
 	punteggio = event.params.punteggio
-  local record = event.params.record
+  local record = event.params.record.punteggio
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen

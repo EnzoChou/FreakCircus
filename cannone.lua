@@ -6,6 +6,9 @@ local score = require("score")
 
 local game = "cannone"
 
+-- Reserve channel 1 for background music
+audio.reserveChannels( 1 )
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -18,6 +21,10 @@ local gameLoopTimer
 local rotazioneCannoneTimer
 local movimentoBersaglioTimer
 local record
+
+local musicTrack
+local cannoneSound
+local colpitoSound
 
 local sheetOptions = {
     frames = {
@@ -127,6 +134,7 @@ local function sparaPallaDiCannone()
     cannone.isBodyActive = false
     angoloCannone = math.pi/6 - cannone.rotation*math.pi/180
     pallaDiCannone:applyLinearImpulse( impulso*math.cos(angoloCannone), -impulso*math.sin(angoloCannone), pallaDiCannone.x, pallaDiCannone.y )
+    audio.play( cannoneSound )
 end
 
 
@@ -259,7 +267,7 @@ end
 local function colpito( event )
 
     if ( event.phase == "began" ) then
-
+        audio.play( colpitoSound )
         local obj1 = event.object1
         local obj2 = event.object2
 
@@ -398,6 +406,12 @@ function scene:create( event )
     clockText = display.newText( uiGroup, formatTime(secondsLeft), display.contentCenterX, 90, native.systemFont, 100 )
     pauseText = display.newText(uiGroup,"Pausa",display.contentCenterX-900,90,native.systemFont,100)
 
+    -- zona audio
+    musicTrack = audio.loadStream( "audio/Clown_and_wizards.mp3" )
+    cannoneSound = audio.loadSound( "audio/Cannon.mp3" )
+    colpitoSound = audio.loadSound( "audio/targetCrack.mp3" )
+    audio.play( musicTrack, { channel=1, loops=-1 } )
+
 end
 
 
@@ -409,6 +423,7 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
+    audio.play( musicTrack, { channel=1, loops=-1 } )
 
 	elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -453,6 +468,7 @@ function scene:hide( event )
         -- Code here runs immediately after the scene goes entirely off screen
         if(secondsLeft==0) then
             composer.removeScene( "cannone" )
+            audio.stop( 1 )
         end
 	end
 end
@@ -463,6 +479,9 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
+  audio.dispose( musicTrack )
+  audio.dispose( cannoneSound )
+  audio.dispose( colpitoSound )
 
 end
 

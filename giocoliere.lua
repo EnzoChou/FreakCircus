@@ -6,6 +6,9 @@ local score = require("score")
 
 local game = "giocoliere"
 
+-- Reserve channel 1 for background music
+audio.reserveChannels( 1 )
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -20,6 +23,9 @@ local record
 local gameLoopTimer
 local lancioLoopTimer
 local lancioTimer
+
+local musicTrack
+local suonoPallina
 
 local sheetOptions = {
     frames = {
@@ -235,6 +241,7 @@ local function onCollision( pallina,event )
             pallina.collision = nil
             vite = vite - 1 -- il giocatore perde una vita
             aggiornaText()
+            audio.play( suonoPallina )
 
             --se le vite sono terminate
             if(vite==0)
@@ -419,6 +426,11 @@ function scene:create( event )
     giocoliere.myName = "giocoliere"
     giocoliere:scale(2,2)
     physics.addBody(giocoliere,"static")
+
+    -- zona audio
+    musicTrack = audio.loadStream( "audio/colonnaGiocoliere2.mp3" )
+    suonoPallina = audio.loadSound( "audio/Paintball.mp3" )
+    audio.play( musicTrack, { channel=1, loops=-1 } )
 end
 
 
@@ -430,6 +442,8 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
+    audio.rewind( musicTrack )
+    audio.play( musicTrack, { channel=1, loops=-1 } )
 
 	elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -469,6 +483,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
+        audio.stop( 1 )
 
         if(vite==0) then
             composer.removeScene("giocoliere")
@@ -482,6 +497,8 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
+  audio.dispose( musicTrack )
+  audio.dispose( suonoPallina )
 
 end
 

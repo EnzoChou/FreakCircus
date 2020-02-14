@@ -34,11 +34,11 @@ end
 
 local function riempimento( punteggio )
     punteggi = punteggio
-    for i = 1, 10 do
+    for i = 1, 10, 2 do
         if ( punteggi[i] ) then
             local yPos = 0 + ( i * 120 )
 
-            local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-50, yPos, native.systemFont, 80 )
+            local rank = display.newText( sceneGroup, (i/2+0.5) .. ")" .. punteggi[i+1], display.contentCenterX-50, yPos, native.systemFont, 80 )
       rank.anchorX = 1
 
       punteggi[i] = formattaPunteggio(punteggi[i])

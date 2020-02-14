@@ -13,8 +13,7 @@ local function getNetworkListener( event )
     else
         local risultati = json.decode( event.response )
         for k,v in pairs( risultati ) do
-            table.insert( punteggi, v.punteggio )
-            table.insert ( punteggi, v.nome )
+            table.insert( punteggi, v)
         end
     end
     callback( punteggi )

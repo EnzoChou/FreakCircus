@@ -1,6 +1,5 @@
 local composer = require( "composer" )
 local score = require("score")
-local tfi = require("textfieldInput")
 local scene = composer.newScene()
 local backScene
 local punteggio

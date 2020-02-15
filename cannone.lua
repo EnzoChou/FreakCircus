@@ -105,7 +105,7 @@ local pavimento
 local scimmia
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local totalTime = 10 -- 3 minuti
+local totalTime = 180 -- 3 minuti
 local secondsLeft = totalTime
 local puntiText
 local clockText
@@ -146,8 +146,8 @@ local function ruotaCannoneOrario()
 end
 
 local function ruotaCannoneAntiOrario()
-    transition.to(cannone,{rotation=-60,time=cannoneRoundTripDelay/2,onComplete = function() ruotaCannoneOrario() end })
-    transition.to(pallaDiCannone,{rotation=-60,time=cannoneRoundTripDelay/2})
+    transition.to(cannone,{rotation=-40,time=cannoneRoundTripDelay/2,onComplete = function() ruotaCannoneOrario() end })
+    transition.to(pallaDiCannone,{rotation=-40,time=cannoneRoundTripDelay/2})
 end
 
 local function ruotaCannone()

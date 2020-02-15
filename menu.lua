@@ -87,48 +87,6 @@ local toggleIndietroOnOff = 0
 local musicTrack
 local bottoneMusic
 
-
-local function gotoCannone( event )
-    local phase = event.phase
-    if phase == "ended" then
-        audio.play( bottoneMusic )
-        composer.gotoScene( "cannone" , { time=800, effect = "crossFade" } )
-        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                          x = -3000
-                                        }
-                      )
-    end
-end
-
-local function gotoGiocoliere( event )
-    local phase = event.phase
-    if phase == "ended" then
-        audio.play( bottoneMusic )
-        composer.gotoScene( "giocoliere" , { time=800, effect = "crossFade" } )
-        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
-                                          x = -3000
-                                        }
-                      )
-    end
-end
-
-local function goToPunteggiCannone( event )
-    local phase = event.phase
-    if phase == "ended" then
-        audio.play( bottoneMusic )
-        composer.gotoScene( "punteggi" , { time=10, params = {game = "cannone"} } )
-    end
-end
-
-local function goToPunteggiGiocoliere( event )
-    local phase = event.phase
-    if phase == "ended" then
-        audio.play( bottoneMusic )
-        composer.gotoScene( "punteggi" , { time=10, params = {game = "giocoliere"} } )
-    end
-end
-
-
 local function toggleIndietroButton()
     if ( gruppoInScena ~= principaleGroup ) then
         transition.to( indietroButton, { time = 1000, effect = "fadeIn", alpha = 1 } )
@@ -138,6 +96,72 @@ local function toggleIndietroButton()
         toggleIndietroOnOff = 0
     end
 end
+
+local function cannoneInScena()
+    composer.gotoScene( "cannone" , { time = 800, effect = "crossFade" } )
+end
+
+local function gotoCannone( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000, onStart = cannoneInScena, onComplete = menuPrincipale
+                                        }
+                      )
+        audio.play( bottoneMusic )
+        toggleIndietroButton()
+    end
+end
+
+local function giocoliereInScena()
+    composer.gotoScene( "giocoliere" , { time = 800, effect = "crossFade" } )
+end
+
+local function gotoGiocoliere( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000, onStart = giocoliereInScena, onComplete = menuPrincipale
+                                        }
+                      )
+        audio.play( bottoneMusic )
+        toggleIndietroButton()
+    end
+end
+
+local function punteggiCannoneInScena()
+    composer.gotoScene( "punteggi" , { time=10, params = {game = "cannone"} } )
+end
+
+local function goToPunteggiCannone( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000, onStart = punteggiCannoneInScena, onComplete = menuPrincipale
+                                        }
+                      )
+        audio.play( bottoneMusic )
+        toggleIndietroButton()
+    end
+end
+
+local function punteggiGiocoliereInScena()
+    composer.gotoScene( "punteggi" , { time=10, params = {game = "giocoliere"} } )
+end
+
+local function goToPunteggiGiocoliere( event )
+    local phase = event.phase
+    if phase == "ended" then
+        transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
+                                          x = -3000,
+                                          onStart = punteggiGiocoliereInScena, onComplete = menuPrincipale
+                                        }
+                      )
+        audio.play( bottoneMusic )
+        toggleIndietroButton()
+    end
+end
+
 
 local function toggleImpostazioniButton()
     if ( toggleImpostazioniOnOff == 0 ) then
@@ -220,11 +244,10 @@ local function gotoImpostazioni( event )
         impostazioniButton:rotate( -30 )
         transition.to( gruppoInScena, { time = 1000, transition = easing.inOutElastic,
                                           x = -3000,
-                                          onStart = impostazioniInScena
+                                          onStart = impostazioniInScena, onComplete = menuPrincipale
                                       }
                      )
         audio.play( bottoneMusic )
-        gruppoInScena = impostazioniGroup
         toggleIndietroButton()
     end
 end
@@ -371,9 +394,8 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   backGroup:insert( impostazioniButton )
 
   -- zona audio
-  musicTrack = audio.loadStream( "audio/Circus.mp3" )
+  musicTrack = audio.loadStream( "audio/colonnaGiocoliere.mp3" )
   bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
-  audio.play( musicTrack, { channel=1, loops=-1 } )
 
 end
 
@@ -407,8 +429,11 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
+    if( gruppoInScena ~= principaleGroup ) then
+        menuPrincipale()
+        toggleIndietroButton()
+    end
     -- ferma la musica
-    tornaMenuPrincipale()
     audio.stop( 1 )
 	end
 end

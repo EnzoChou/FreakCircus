@@ -184,6 +184,7 @@ end
 
 local function pausa()
     composer.gotoScene("pausa",{time=10,params = {scene = "giocoliere"} })
+    audio.stop( 1 )
 end
 
 -- aggiorna vite
@@ -377,6 +378,7 @@ local function start ()
 
       --fa partire il gioco
       timer.performWithDelay(countdown*1000,startGame,1)
+      audio.play( musicTrack, { channel=1, loops=-1 } )
 end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -430,7 +432,6 @@ function scene:create( event )
     -- zona audio
     musicTrack = audio.loadStream( "audio/colonnaGiocoliere2.mp3" )
     suonoPallina = audio.loadSound( "audio/Paintball.mp3" )
-    audio.play( musicTrack, { channel=1, loops=-1 } )
 end
 
 
@@ -497,6 +498,7 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
+  audio.stop( 1 )
   audio.dispose( musicTrack )
   audio.dispose( suonoPallina )
 

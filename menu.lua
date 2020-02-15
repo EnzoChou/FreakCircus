@@ -373,6 +373,7 @@ punteggiGroup:insert( punteggiGiocoliereButton )
   -- zona audio
   musicTrack = audio.loadStream( "audio/Circus.mp3" )
   bottoneMusic = audio.loadSound( "audio/Tiny Button Push-SoundBible.com-513260752.wav" )
+  audio.play( musicTrack, { channel=1, loops=-1 } )
 
 end
 

@@ -205,6 +205,7 @@ end
 
 local function pausa()
     composer.gotoScene("pausa",{time=10,params = {scene = "cannone"} })
+    audio.stop( 1 )
 end
 
 local function associaRecord( punteggi )
@@ -267,7 +268,6 @@ end
 local function colpito( event )
 
     if ( event.phase == "began" ) then
-        audio.play( colpitoSound )
         local obj1 = event.object1
         local obj2 = event.object2
 
@@ -277,6 +277,7 @@ local function colpito( event )
         if ( ( obj1.myName == "bersaglio" and obj2.myName == "pallaDiCannone" ) or
             ( obj1.myName == "pallaDiCannone" and obj2.myName == "bersaglio" ) )
         then
+            audio.play( colpitoSound )
             local risultato = valore( obj2.y, obj1.y )
             mostraScritta("+"..risultato,1000)
             transition.pause()
@@ -331,6 +332,7 @@ local function start()
 
     --fa partire il gioco
     timer.performWithDelay(countdown*1000,startGame,1)
+    audio.play( musicTrack, { channel=1, loops=-1 } )
 end
 
 
@@ -410,7 +412,6 @@ function scene:create( event )
     musicTrack = audio.loadStream( "audio/Clown_and_wizards.mp3" )
     cannoneSound = audio.loadSound( "audio/Cannon.mp3" )
     colpitoSound = audio.loadSound( "audio/targetCrack.mp3" )
-    audio.play( musicTrack, { channel=1, loops=-1 } )
 
 end
 
@@ -479,6 +480,7 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
+  audio.stop( 1 )
   audio.dispose( musicTrack )
   audio.dispose( cannoneSound )
   audio.dispose( colpitoSound )

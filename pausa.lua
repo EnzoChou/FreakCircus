@@ -63,8 +63,8 @@ end
 function scene:create( event )
 
 	backScene = event.params.scene
-	punteggio = event.params.punteggio
-  local record = event.params.record.punteggio
+  punteggio = event.params.punteggio
+  local record = event.params.record
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
@@ -79,7 +79,7 @@ function scene:create( event )
 		--se la partita è finita
 		resumeText = "Rigioca"
 
-		local isRecord = punteggio > record -- se il nuovo punteggio va inserito nella classifica top 10
+		local isRecord = punteggio > record.punteggio[1] and record.punteggio[2]>10 -- se il nuovo punteggio va inserito nella classifica top 10
 		local text = formattaPunteggio(punteggio)
 
 		--se il punteggio è il nuovo record

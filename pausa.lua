@@ -79,7 +79,7 @@ function scene:create( event )
 		--se la partita è finita
 		resumeText = "Rigioca"
 
-		local isRecord = punteggio > record.punteggio[1] and record.punteggio[2]>10 -- se il nuovo punteggio va inserito nella classifica top 10
+		local isRecord = record == nil or punteggio > record.punteggio -- se il nuovo punteggio va inserito nella classifica top 10
 		local text = formattaPunteggio(punteggio)
 
 		--se il punteggio è il nuovo record

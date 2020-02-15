@@ -105,7 +105,7 @@ local pavimento
 local scimmia
 local angoloCannone = math.pi/6 --30 gradi (angolo iniziale)
 
-local totalTime = 180 -- 3 minuti
+local totalTime = 10 -- 3 minuti
 local secondsLeft = totalTime
 local puntiText
 local clockText
@@ -209,7 +209,7 @@ local function pausa()
 end
 
 local function associaRecord( punteggi )
-    record = punteggi[table.maxn(punteggi)]
+    record = punteggi[10]
 end
 
 local function endGame()

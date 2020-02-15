@@ -179,7 +179,7 @@ local function endGame()
 end
 
 local function associaRecord( punteggi )
-    record = punteggi[table.maxn(punteggi)]
+    record = punteggi[10]
 end
 
 local function pausa()

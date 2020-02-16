@@ -36,12 +36,16 @@ local function riempimento( punteggi )
         if ( punteggi[i] ) then
             local yPos = 0 + ( i * 120 )
 
-            local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-200, yPos, native.systemFont, 80 )
+            local rank = display.newText( sceneGroup, i .. ")", display.contentCenterX-220, yPos, native.systemFont, 80 )
             rank.anchorX = 1
 
-            punteggi[i] = formattaPunteggio(punteggi[i].punteggio) .. "       " .. punteggi[i].nome
-            local punteggio = display.newText( sceneGroup, punteggi[i], display.contentCenterX-180, yPos, native.systemFont, 80 )
-            punteggio.anchorX = 0
+            local p = formattaPunteggio(punteggi[i].punteggio)
+            local punteggio = display.newText( sceneGroup, p , display.contentCenterX-200, yPos, native.systemFont, 80 )
+			punteggio.anchorX = 0
+			
+			local nome = display.newText( sceneGroup, punteggi[i].nome , display.contentCenterX+200, yPos, native.systemFont, 80 )
+			nome:setFillColor(1,0.84,0)
+			nome.anchorX = 0
         end
     end
 end

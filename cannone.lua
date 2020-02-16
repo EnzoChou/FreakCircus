@@ -292,8 +292,6 @@ local function colpito( event )
 
             punti = punti + risultato
             aggiornaText()
-
-            timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
 
         if ( ( obj1.myName == "pavimento" and obj2.myName == "pallaDiCannone" ) or
@@ -301,8 +299,12 @@ local function colpito( event )
         then
             transition.pause()
             pallaDiCannone:setLinearVelocity(0,-100) -- la palla rimbalza di poco quando colpisce il pavimento (evita effetto sponda per colpire il bersaglio)
-            timer.performWithDelay( 500, riposizionaPallaDiCannone )
         end
+
+        --riposiziona la palla di cannone
+        Runtime:removeEventListener("collision",colpito)
+        timer.performWithDelay( 500, riposizionaPallaDiCannone )
+        timer.performWithDelay(600,function () Runtime:addEventListener("collision",colpito) end)
     end
 end
 

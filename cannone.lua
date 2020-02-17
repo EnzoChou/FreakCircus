@@ -437,7 +437,7 @@ function scene:show( event )
             start()
         else
             --durante il gioco
-            transition.resume()
+            --transition.resume()
             timer.resume(gameLoopTimer)
             timer.resume(movimentoBersaglioTimer)
             timer.resume(rotazioneCannoneTimer)
